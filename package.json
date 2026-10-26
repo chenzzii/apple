@@ -1,0 +1,22 @@
+{
+  "name": "orchard-panic",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Orchard Panic — an original HD 2D cartoon spiritual remake of 1981 Apple Panic gameplay (Stage 1 prototype).",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "phaser": "4.2.1"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "vite": "8.3.5",
+    "vitest": "5.0.5"
+  }
+}

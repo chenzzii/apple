@@ -1,0 +1,27 @@
+{
+  "id": "level01",
+  "name": "第 1 關：果園入口",
+  "cols": 24,
+  "floorY": [112, 204, 296, 388, 480],
+  "diggableFloors": [0, 1, 2, 3],
+  "ladders": [
+    { "col": 4, "top": 0, "bottom": 1 },
+    { "col": 15, "top": 0, "bottom": 1 },
+    { "col": 21, "top": 0, "bottom": 1 },
+    { "col": 8, "top": 1, "bottom": 2 },
+    { "col": 19, "top": 1, "bottom": 2 },
+    { "col": 2, "top": 2, "bottom": 3 },
+    { "col": 12, "top": 2, "bottom": 3 },
+    { "col": 22, "top": 2, "bottom": 3 },
+    { "col": 6, "top": 3, "bottom": 4 },
+    { "col": 17, "top": 3, "bottom": 4 }
+  ],
+  "player": { "col": 11, "floor": 4 },
+  "enemies": [
+    { "kind": "red", "col": 10, "floor": 0, "dir": -1 },
+    { "kind": "red", "col": 3, "floor": 1, "dir": 1 },
+    { "kind": "red", "col": 17, "floor": 2, "dir": -1 }
+  ],
+  "timeLimitSec": 150,
+  "seed": 1981
+}

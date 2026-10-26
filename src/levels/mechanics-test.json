@@ -1,0 +1,105 @@
+{
+  "id": "mechanics-test",
+  "name": "機制測試關（綠 2 層／藍 3 層）",
+  "cols": 24,
+  "floorY": [
+    112,
+    204,
+    296,
+    388,
+    480
+  ],
+  "diggableFloors": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "ladders": [
+    {
+      "col": 3,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 18,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 7,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 21,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 1,
+      "top": 2,
+      "bottom": 3
+    },
+    {
+      "col": 12,
+      "top": 2,
+      "bottom": 3
+    },
+    {
+      "col": 4,
+      "top": 3,
+      "bottom": 4
+    },
+    {
+      "col": 16,
+      "top": 3,
+      "bottom": 4
+    }
+  ],
+  "player": {
+    "col": 9,
+    "floor": 0
+  },
+  "enemies": [
+    {
+      "kind": "blue",
+      "col": 20,
+      "floor": 0,
+      "dir": -1
+    },
+    {
+      "kind": "green",
+      "col": 1,
+      "floor": 0,
+      "dir": 1
+    },
+    {
+      "kind": "red",
+      "col": 20,
+      "floor": 3,
+      "dir": -1
+    }
+  ],
+  "presetHoles": [
+    {
+      "floor": 1,
+      "col": 8
+    },
+    {
+      "floor": 1,
+      "col": 10
+    },
+    {
+      "floor": 2,
+      "col": 10
+    },
+    {
+      "floor": 2,
+      "col": 9
+    }
+  ],
+  "timeLimitSec": 240,
+  "seed": 4242,
+  "debug": true
+}
