@@ -1,8 +1,8 @@
 /**
- * Ambush spot per campaign level for the scripted player (tests/ambushBot.ts): [col, upperFloor, shaftSide].
+ * Ambush spot per campaign level for the scripted player (tests/ambushBot.ts): [col, upperFloor, shaftSide, shaftDepth (default 2)].
  * Found by searching all spots over several enemy-RNG seeds; used by unit tests and the browser playtest.
  */
-export const SPOT: Record<string, [number, number, -1 | 1]> = {
+export const SPOT: Record<string, [number, number, -1 | 1, number?]> = {
   level01: [3, 0, -1],
   level02: [7, 1, -1],
   level03: [12, 1, -1],
@@ -13,4 +13,9 @@ export const SPOT: Record<string, [number, number, -1 | 1]> = {
   level08: [19, 1, -1],
   level09: [12, 1, 1],
   level10: [18, 1, -1],
+  level11: [12, 0, -1, 3],
+  level12: [5, 0, 1, 3],
+  level13: [20, 1, -1, 3],
+  level14: [6, 1, 1, 3],
+  level15: [18, 1, -1, 3],
 };

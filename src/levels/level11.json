@@ -1,0 +1,118 @@
+{
+  "id": "level11",
+  "name": "第 11 關：沙漠溫室",
+  "cols": 24,
+  "floorY": [
+    112,
+    204,
+    296,
+    388,
+    480
+  ],
+  "diggableFloors": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "ladders": [
+    {
+      "col": 4,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 9,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 21,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 1,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 6,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 15,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 12,
+      "top": 2,
+      "bottom": 3
+    },
+    {
+      "col": 19,
+      "top": 2,
+      "bottom": 3
+    },
+    {
+      "col": 6,
+      "top": 3,
+      "bottom": 4
+    },
+    {
+      "col": 15,
+      "top": 3,
+      "bottom": 4
+    },
+    {
+      "col": 21,
+      "top": 3,
+      "bottom": 4
+    }
+  ],
+  "player": {
+    "col": 11,
+    "floor": 4
+  },
+  "enemies": [
+    {
+      "kind": "blue",
+      "col": 15,
+      "floor": 0,
+      "dir": -1
+    },
+    {
+      "kind": "green",
+      "col": 10,
+      "floor": 1,
+      "dir": 1
+    },
+    {
+      "kind": "green",
+      "col": 5,
+      "floor": 0,
+      "dir": 1
+    },
+    {
+      "kind": "green",
+      "col": 14,
+      "floor": 1,
+      "dir": -1
+    },
+    {
+      "kind": "green",
+      "col": 11,
+      "floor": 0,
+      "dir": 1
+    }
+  ],
+  "timeLimitSec": 330,
+  "seed": 2037,
+  "theme": {
+    "skyTop": "#ffd59a",
+    "skyBottom": "#fff1d6"
+  },
+  "hint": "藍仙人掌要連續掉 3 層：同一直行挖好三層對齊的洞！"
+}

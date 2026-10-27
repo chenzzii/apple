@@ -1,6 +1,6 @@
-// Generates src/levels/level01.json … level10.json from the owner's progression rule:
+// Generates src/levels/level01.json … level15.json from the owner's progression rule:
 //   L1–L5: 1–5 red apples. From L6 the total stays 5 and one red becomes a green flytrap per level
-//   (L6 4R+1G … L10 5G). Enemy speed stays at the default 80 px/s for every level.
+//   (L6 4R+1G … L10 5G); from L11 one green becomes a blue cactus per level (L11 4G+1B … L15 5B). Enemy speed stays at the default 80 px/s for every level.
 // Ladder layouts are varied with a seeded RNG but checked against simple rules so every level is
 // fair. Run: node tools/gen-levels.mjs   (output is deterministic; commit the JSON it writes)
 import { writeFileSync } from 'node:fs';
@@ -30,11 +30,17 @@ const META = [
   { name: '濕地溫室', theme: { skyTop: '#8fd8c8', skyBottom: '#eaf6e0' }, hint: '捕蠅草變多了：先把對齊的洞準備好再引牠們過來。' },
   { name: '食蟲植物園', theme: { skyTop: '#7fcfb8', skyBottom: '#f3f0d0' }, hint: '只剩一隻紅蘋果，其他都要掉 2 層！' },
   { name: '捕蠅草大溫室', theme: { skyTop: '#6fc0a8', skyBottom: '#f8ead0' }, hint: '五隻捕蠅草！準備好兩組對齊的洞再開始。' },
+  { name: '沙漠溫室', theme: { skyTop: '#ffd59a', skyBottom: '#fff1d6' }, hint: '藍仙人掌要連續掉 3 層：同一直行挖好三層對齊的洞！' },
+  { name: '仙人掌小丘', theme: { skyTop: '#ffc98a', skyBottom: '#fbe9cf' }, hint: '三層對齊的洞也能一次解決捕蠅草，先把深洞準備好。' },
+  { name: '日落沙丘', theme: { skyTop: '#ffb07a', skyBottom: '#ffe0c0' }, hint: '從最下面的洞開始挖，再一層一層往上，就不會掉進自己的洞。' },
+  { name: '仙人掌花園', theme: { skyTop: '#f7a27a', skyBottom: '#ffd9c0' }, hint: '只剩一隻捕蠅草了，其他都要掉 3 層！' },
+  { name: '仙人掌王國', theme: { skyTop: '#e98f7a', skyBottom: '#ffd0b8' }, hint: '五隻藍仙人掌！準備好三層深的洞再引牠們過來。' },
 ];
 
 function counts(n) {
-  if (n <= 5) return { red: n, green: 0 };
-  return { red: 10 - n, green: n - 5 };
+  if (n <= 5) return { red: n, green: 0, blue: 0 };
+  if (n <= 10) return { red: 10 - n, green: n - 5, blue: 0 };
+  return { red: 0, green: 15 - n, blue: n - 10 };
 }
 
 /** Pick ladders: per gap 2–3 columns, spaced >= 5 apart, not stacked on the gap above/below. */
@@ -67,22 +73,27 @@ function ladderCells(ls) {
   return s;
 }
 
-/** A 2-deep shaft spot on the top floors exists (needed to make greens beatable comfortably). */
-function hasShaftSpot(ls) {
+/** An aligned shaft spot `depth` floors deep exists near the top (needed for greens/blues). */
+function hasShaftSpot(ls, depth = 2) {
   const cells = ladderCells(ls);
-  for (let c = 3; c <= 20; c++) {
-    const ok = [`0:${c - 1}`, `0:${c}`, `0:${c + 1}`, `1:${c + 1}`, `1:${c + 2}`, `1:${c - 1}`, `1:${c - 2}`].every((k) => !cells.has(k));
-    if (ok) return true;
+  for (let top = 0; top + depth <= 4; top++) {
+    for (let c = 3; c <= 20; c++) {
+      for (const side of [-1, 1]) {
+        const keys = [`${top}:${c - 1}`, `${top}:${c}`, `${top}:${c + 1}`];
+        for (let f = top + 1; f < top + depth; f++) keys.push(`${f}:${c + side}`, `${f}:${c + 2 * side}`);
+        if (keys.every((k) => !cells.has(k))) return true;
+      }
+    }
   }
   return false;
 }
 
-function spawns(r, red, green, ls) {
+function spawns(r, red, green, ls, blue = 0) {
   // Enemies start on floors 0–2, away from ladder cells, spread out; the player starts on the bottom floor.
   const cells = ladderCells(ls);
-  const kinds = [...Array(green).fill('green'), ...Array(red).fill('red')];
+  const kinds = [...Array(blue).fill('blue'), ...Array(green).fill('green'), ...Array(red).fill('red')];
   const out = [];
-  const floorsFor = (k, i) => (k === 'green' ? [0, 1][i % 2] : [0, 1, 2][i % 3]);
+  const floorsFor = (k, i) => (k === 'red' ? [0, 1, 2][i % 3] : [0, 1][i % 2]);
   kinds.forEach((kind, i) => {
     const floor = floorsFor(kind, i);
     let col = 0;
@@ -99,19 +110,20 @@ function spawns(r, red, green, ls) {
 }
 
 // Layout-seed bumps chosen after checking fairness with the scripted player (see tests/levels.test.ts).
-const LAYOUT_BUMP = { 6: 2, 7: 6, 8: 3, 9: 1, 10: 4, ...JSON.parse(process.env.LAYOUT_BUMP ?? '{}') };
+const LAYOUT_BUMP = { 6: 2, 7: 6, 8: 3, 9: 1, 10: 4, 11: 3, 12: 1, 13: 5, 14: 5, 15: 5, ...JSON.parse(process.env.LAYOUT_BUMP ?? '{}') };
 const ONLY = process.env.ONLY ? Number(process.env.ONLY) : null;
 const OUT_DIR = process.env.OUT_DIR ?? null;
 
-for (let n = 1; n <= 10; n++) {
+for (let n = 1; n <= META.length; n++) {
   if (ONLY && n !== ONLY) continue;
   const meta = META[n - 1];
-  const { red, green } = counts(n);
+  const { red, green, blue } = counts(n);
+  const depth = blue ? 3 : 2;
   let seed = 1000 + n * 97 + (LAYOUT_BUMP[n] ?? 0) * 7919;
   let r = rng(seed);
   let ls = ladders(r);
   let tries = 0;
-  while (!hasShaftSpot(ls) && tries++ < 50) {
+  while (!hasShaftSpot(ls, depth) && tries++ < 50) {
     seed++;
     r = rng(seed);
     ls = ladders(r);
@@ -124,14 +136,14 @@ for (let n = 1; n <= 10; n++) {
     diggableFloors: [0, 1, 2, 3],
     ladders: ls,
     player: { col: 11, floor: 4 },
-    enemies: spawns(r, red, green, ls),
-    // Time grows with the work: a base plus more per green (needs a 2-floor setup).
-    timeLimitSec: 90 + 30 * red + 45 * green,
+    enemies: spawns(r, red, green, ls, blue),
+    // Time grows with the work: a base plus more per green (2-floor setup) and blue (3-floor setup).
+    timeLimitSec: 90 + 30 * red + 45 * green + 60 * blue,
     seed: 2026 + n,
     ...(meta.theme ? { theme: meta.theme } : {}),
     hint: meta.hint,
   };
   const file = OUT_DIR ? `${OUT_DIR}/${level.id}.json` : new URL(`../src/levels/${level.id}.json`, import.meta.url);
   writeFileSync(file, JSON.stringify(level, null, 2) + '\n');
-  console.log(level.id, `${red}R ${green}G`, `${level.timeLimitSec}s`, 'ladders', ls.map((l) => `${l.top}:${l.col}`).join(' '));
+  console.log(level.id, `${red}R ${green}G ${blue}B`, `${level.timeLimitSec}s`, 'ladders', ls.map((l) => `${l.top}:${l.col}`).join(' '));
 }

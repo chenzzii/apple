@@ -9,6 +9,9 @@ export default defineConfig({
   },
   test: {
     include: ['tests/**/*.test.ts'],
+    // The campaign is loaded with import.meta.glob; a cached transform would miss newly added
+    // level files, so do not reuse transformed modules between runs.
+    fsModuleCache: false,
     environment: 'node',
   },
 });

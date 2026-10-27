@@ -31,8 +31,8 @@ const MAX_ATTEMPTS = Number(process.env.MAX_ATTEMPTS || 8);
   const makeBot = () => p.evaluate(async (id) => {
     const m = await import('/tests/ambushBot.ts');
     const s = await import('/tests/levelSpots.ts');
-    const [col, up, side] = s.SPOT[id];
-    window.__bot = new m.AmbushBot(col, up, up + 1, side);
+    const [col, up, side, depth = 2] = s.SPOT[id];
+    window.__bot = new m.AmbushBot(col, up, up + depth - 1, side);
   }, LEVEL);
   await makeBot();
   const KEYS = { left: 'ArrowLeft', right: 'ArrowRight', up: 'ArrowUp', down: 'ArrowDown', digLeftHeld: 'j', digRightHeld: 'k' };

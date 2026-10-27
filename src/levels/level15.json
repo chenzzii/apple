@@ -1,0 +1,113 @@
+{
+  "id": "level15",
+  "name": "第 15 關：仙人掌王國",
+  "cols": 24,
+  "floorY": [
+    112,
+    204,
+    296,
+    388,
+    480
+  ],
+  "diggableFloors": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "ladders": [
+    {
+      "col": 2,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 7,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 9,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 15,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 20,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 7,
+      "top": 2,
+      "bottom": 3
+    },
+    {
+      "col": 13,
+      "top": 2,
+      "bottom": 3
+    },
+    {
+      "col": 22,
+      "top": 2,
+      "bottom": 3
+    },
+    {
+      "col": 4,
+      "top": 3,
+      "bottom": 4
+    },
+    {
+      "col": 10,
+      "top": 3,
+      "bottom": 4
+    }
+  ],
+  "player": {
+    "col": 11,
+    "floor": 4
+  },
+  "enemies": [
+    {
+      "kind": "blue",
+      "col": 17,
+      "floor": 0,
+      "dir": -1
+    },
+    {
+      "kind": "blue",
+      "col": 22,
+      "floor": 1,
+      "dir": -1
+    },
+    {
+      "kind": "blue",
+      "col": 3,
+      "floor": 0,
+      "dir": 1
+    },
+    {
+      "kind": "blue",
+      "col": 12,
+      "floor": 1,
+      "dir": -1
+    },
+    {
+      "kind": "blue",
+      "col": 9,
+      "floor": 0,
+      "dir": 1
+    }
+  ],
+  "timeLimitSec": 390,
+  "seed": 2041,
+  "theme": {
+    "skyTop": "#e98f7a",
+    "skyBottom": "#ffd0b8"
+  },
+  "hint": "五隻藍仙人掌！準備好三層深的洞再引牠們過來。"
+}
