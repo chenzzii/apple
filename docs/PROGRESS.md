@@ -10,6 +10,11 @@ npm run dev        # open the printed http://localhost:5173 URL
 Menu: **Enter** start level 1 · **T** mechanics test level · **H** help · **C** switch keymap · **1–4** world speed (1.0 / 1.25 / 1.5 / 2.0x).
 In game: arrows/WASD move & climb, **J** LEFT tile / **K** RIGHT tile — dig solid floor, fill an open hole, pound a trapped enemy (classic keymap: I/J/K/M + A/S) · **Esc/P** pause · **H** help · **R** restart · **N** mute all · **B** music on/off · **G** re-open test holes (test level only).
 
+## 2026-10-27 (4) — enemies redesigned as plants (owner request)
+- Red stays an apple (already a plant; now with root feet and two leaves). Green butterfly → **綠捕蠅草** (wide, two spiky jaws hinged at the back that snap open toward its walking direction). Blue mask → **藍仙人掌** (tall, arms, spines, flower on top). Rules, colours and scores unchanged; silhouettes stay squat / wide / tall so they are distinguishable without colour.
+- Labels updated in legend, menu help and in-game help. Side panels made taller so the test-level key list fits.
+- `npm run typecheck` ✅ · `npm run test` ✅ 42 · `npm run build` ✅ · browser: menu/legend/trapped flytrap screenshots checked; loss + mechanics clear still pass; 0 console errors.
+
 ## 2026-10-27 (3) — original background music (owner request)
 - Two original loops written as data in `src/game/music/score.ts`, played by a look-ahead Web Audio sequencer (`src/game/music/Music.ts`); no audio files, no third-party music.
   - Menu: "Morning Orchard" (100 BPM, triangle lead + arpeggio + bass).
@@ -36,7 +41,7 @@ In game: arrows/WASD move & climb, **J** LEFT tile / **K** RIGHT tile — dig so
 - Pure TypeScript deterministic simulation in `src/core/` (fixed 60 Hz, seeded RNG, typed events), no Phaser imports.
 - Phaser 4.2.1 scenes in `src/game/` render with interpolation, own the keyboard, HUD, overlays, Web Audio SFX and particles.
 - Two validated JSON levels in `src/levels/`: `level01` (3 red, clearable) and `mechanics-test` (green + blue + red with aligned/offset preset shafts).
-- Original programmatic cartoon art (`src/rendering/VectorArt.ts`): gardener, round apple, wide-winged butterfly, tall mask; no external assets.
+- Original programmatic cartoon art (`src/rendering/VectorArt.ts`): gardener and three plant enemies (squat apple, wide flytrap, tall cactus); no external assets.
 
 ## Commands run (2026-10-26, Node 22.23, this container)
 | Command | Result |

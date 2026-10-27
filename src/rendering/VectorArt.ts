@@ -43,8 +43,8 @@ export const PALETTE = {
 
 export const ENEMY_COLORS: Record<EnemyKind, { main: number; dark: number; label: string; floors: number }> = {
   red: { main: PALETTE.red, dark: PALETTE.redDark, label: '紅蘋果', floors: 1 },
-  green: { main: PALETTE.green, dark: PALETTE.greenDark, label: '綠蝴蝶', floors: 2 },
-  blue: { main: PALETTE.blue, dark: PALETTE.blueDark, label: '藍面具', floors: 3 },
+  green: { main: PALETTE.green, dark: PALETTE.greenDark, label: '綠捕蠅草', floors: 2 },
+  blue: { main: PALETTE.blue, dark: PALETTE.blueDark, label: '藍仙人掌', floors: 3 },
 };
 
 export interface GardenerPose {
@@ -179,15 +179,18 @@ export interface EnemyPose {
   climbing: boolean;
 }
 
-/** Three distinct silhouettes: squat round apple, wide-winged butterfly, tall mask. */
+/**
+ * Three PLANT enemies with distinct silhouettes (not just colour):
+ * red = squat round walking apple, green = wide snapping flytrap, blue = tall cactus.
+ */
 export function drawEnemy(g: G, kind: EnemyKind, x: number, y: number, pose: EnemyPose): void {
   switch (kind) {
     case 'red':
       return drawApple(g, x, y, pose);
     case 'green':
-      return drawButterfly(g, x, y, pose);
+      return drawFlytrap(g, x, y, pose);
     case 'blue':
-      return drawMask(g, x, y, pose);
+      return drawCactus(g, x, y, pose);
   }
 }
 
@@ -213,92 +216,147 @@ function eyes(g: G, x: number, y: number, dir: number, angry: boolean, dizzy: bo
   }
 }
 
+/** Little root "feet" that shuffle while walking. */
+function rootFeet(g: G, x: number, y: number, t: number, spread: number, still: boolean): void {
+  const s = still ? 0 : Math.sin(t * 10) * 3;
+  g.lineStyle(3, PALETTE.wood, 1);
+  g.lineBetween(x - spread * 0.4, y - 6, x - spread + s, y - 1);
+  g.lineBetween(x - spread * 0.1, y - 6, x - spread * 0.35 - s, y);
+  g.lineBetween(x + spread * 0.1, y - 6, x + spread * 0.35 + s, y);
+  g.lineBetween(x + spread * 0.4, y - 6, x + spread - s, y - 1);
+}
+
+const PINK = 0xff8fb1;
+const PINK_DARK = 0xd94f7c;
+
+/** Red: squat, round walking apple (1 floor). */
 function drawApple(g: G, x: number, y: number, p: EnemyPose): void {
   const bob = p.trapped || p.falling ? 0 : Math.abs(Math.sin(p.t * 10)) * 2;
   const squash = p.falling ? 0.85 : 1;
-  const cy = y - 16 - bob;
-  // feet
-  if (!p.trapped) {
-    g.fillStyle(PALETTE.redDark, 1);
-    g.fillEllipse(x - 7 + Math.sin(p.t * 10) * 3, y - 2, 10, 5);
-    g.fillEllipse(x + 7 - Math.sin(p.t * 10) * 3, y - 2, 10, 5);
-  }
+  const cy = y - 17 - bob;
+  if (!p.trapped) rootFeet(g, x, y, p.t, 13, p.falling || p.stunned);
   g.lineStyle(3, PALETTE.ink, 1);
   g.fillStyle(PALETTE.red, 1);
-  g.fillEllipse(x, cy, 32 * squash, 28 / squash);
-  g.strokeEllipse(x, cy, 32 * squash, 28 / squash);
+  // two-lobed apple body
+  g.fillEllipse(x - 5, cy, 22 * squash, 27 / squash);
+  g.fillEllipse(x + 5, cy, 22 * squash, 27 / squash);
+  g.strokeEllipse(x, cy, 33 * squash, 28 / squash);
   g.fillStyle(0xffffff, 0.35);
-  g.fillEllipse(x - 7, cy - 6, 8, 6);
-  // stem + leaf
+  g.fillEllipse(x - 8, cy - 6, 8, 6);
+  // stem + two leaves
   g.lineStyle(3, PALETTE.wood, 1);
-  g.lineBetween(x, cy - 13, x + 2, cy - 20);
+  g.lineBetween(x, cy - 12, x + 2, cy - 20);
   g.fillStyle(PALETTE.grassTop, 1);
-  g.fillEllipse(x + 8, cy - 18, 11, 6);
+  g.lineStyle(2, PALETTE.ink, 1);
+  g.fillEllipse(x + 9, cy - 18, 13, 6);
+  g.strokeEllipse(x + 9, cy - 18, 13, 6);
+  g.fillEllipse(x - 6, cy - 19, 9, 5);
   eyes(g, x, cy - 1, p.dir, true, p.stunned);
 }
 
-function drawButterfly(g: G, x: number, y: number, p: EnemyPose): void {
-  const flap = p.trapped ? 0.4 : 0.5 + 0.5 * Math.sin(p.t * 14);
-  const cy = y - 20;
-  const w = 16 + flap * 10;
+/** Green: WIDE snapping flytrap — two spiky jaws hinged at the back, opening toward where it walks (2 floors). */
+function drawFlytrap(g: G, x: number, y: number, p: EnemyPose): void {
+  const d = p.dir;
+  const open = p.trapped ? 0.12 : p.stunned ? 0.05 : p.falling ? 0.55 : 0.3 + 0.28 * Math.abs(Math.sin(p.t * 7));
+  const hy = y - 26;
+  const hx = x - d * 20; // hinge at the back of the head
+  const R = 22; // half jaw length
+  const H = 13; // jaw thickness
+  // local (u along the mouth toward the front, v up) -> screen, with jaw rotation
+  const toScreen = (u: number, v: number, a: number) => {
+    const ur = u * Math.cos(a) - v * Math.sin(a);
+    const vr = u * Math.sin(a) + v * Math.cos(a);
+    return new Phaser.Math.Vector2(hx + d * ur, hy - vr);
+  };
+  const jaw = (side: 1 | -1) => {
+    const a = side * open;
+    const pts: Phaser.Math.Vector2[] = [];
+    for (let i = 0; i <= 14; i++) {
+      const th = (i / 14) * Math.PI;
+      pts.push(toScreen(R - R * Math.cos(th), side * H * Math.sin(th), a));
+    }
+    return { a, pts };
+  };
+  // stem + leaf feet
   g.lineStyle(3, PALETTE.ink, 1);
-  g.fillStyle(PALETTE.green, 1);
-  // wings (wide silhouette)
-  g.fillEllipse(x - w * 0.8, cy - 6, w, 20);
-  g.strokeEllipse(x - w * 0.8, cy - 6, w, 20);
-  g.fillEllipse(x + w * 0.8, cy - 6, w, 20);
-  g.strokeEllipse(x + w * 0.8, cy - 6, w, 20);
   g.fillStyle(PALETTE.greenDark, 1);
-  g.fillEllipse(x - w * 0.7, cy + 8, w * 0.7, 12);
-  g.fillEllipse(x + w * 0.7, cy + 8, w * 0.7, 12);
-  g.fillStyle(PALETTE.gold, 1);
-  g.fillCircle(x - w * 0.8, cy - 6, 3);
-  g.fillCircle(x + w * 0.8, cy - 6, 3);
-  // body
-  g.fillStyle(PALETTE.greenDark, 1);
-  g.fillEllipse(x, cy + 2, 12, 30);
-  g.strokeEllipse(x, cy + 2, 12, 30);
-  // antennae
-  g.lineStyle(2, PALETTE.ink, 1);
-  g.lineBetween(x - 2, cy - 12, x - 7, cy - 22);
-  g.lineBetween(x + 2, cy - 12, x + 7, cy - 22);
-  g.fillStyle(PALETTE.ink, 1);
-  g.fillCircle(x - 7, cy - 22, 2.5);
-  g.fillCircle(x + 7, cy - 22, 2.5);
-  eyes(g, x, cy - 6, p.dir, false, p.stunned);
+  const sx = x - d * 10; // stem sits under the middle-back of the head
+  g.fillRect(sx - 3, hy + 4, 6, y - hy - 10);
+  const s = p.trapped || p.falling || p.stunned ? 0 : Math.sin(p.t * 10) * 3;
+  if (!p.trapped) {
+    g.fillStyle(PALETTE.green, 1);
+    g.lineStyle(2, PALETTE.ink, 1);
+    g.fillEllipse(sx - 8 + s, y - 4, 16, 7);
+    g.strokeEllipse(sx - 8 + s, y - 4, 16, 7);
+    g.fillEllipse(sx + 8 - s, y - 4, 16, 7);
+    g.strokeEllipse(sx + 8 - s, y - 4, 16, 7);
+  }
+  const lower = jaw(-1);
+  const upper = jaw(1);
+  // pink mouth between the jaws
+  g.fillStyle(PINK, 1);
+  g.fillPoints([toScreen(0, 0, 0), toScreen(2 * R, 0, upper.a), toScreen(2 * R, 0, lower.a)], true);
+  for (const j of [lower, upper]) {
+    const side = j === upper ? 1 : -1;
+    // bristles along the inner edge (pointing into the mouth)
+    g.fillStyle(PALETTE.white, 1);
+    for (let u = 8; u <= 2 * R; u += 6) {
+      const b0 = toScreen(u - 2.5, 0, j.a);
+      const b1 = toScreen(u + 2.5, 0, j.a);
+      const tip = toScreen(u, -side * 6, j.a);
+      g.fillTriangle(b0.x, b0.y, b1.x, b1.y, tip.x, tip.y);
+    }
+    g.fillStyle(side === 1 ? PALETTE.green : PALETTE.greenDark, 1);
+    g.lineStyle(3, PALETTE.ink, 1);
+    g.fillPoints(j.pts, true);
+    g.strokePoints(j.pts, true);
+  }
+  // pink inner blush + eyes on the upper jaw
+  const spot = toScreen(R * 1.3, H * 0.35, upper.a);
+  g.fillStyle(PINK_DARK, 0.85);
+  g.fillCircle(spot.x, spot.y, 2.5);
+  const e = toScreen(R * 0.85, H * 0.95, upper.a);
+  eyes(g, e.x, e.y - 3, d, false, p.stunned);
 }
 
-function drawMask(g: G, x: number, y: number, p: EnemyPose): void {
+/** Blue: TALL cactus with arms, spines and a flower (3 floors). */
+function drawCactus(g: G, x: number, y: number, p: EnemyPose): void {
   const sway = p.trapped ? 0 : Math.sin(p.t * 6) * 2;
   const top = y - 46;
+  const bx = x + sway;
+  if (!p.trapped) rootFeet(g, x, y, p.t, 12, p.falling || p.stunned);
   g.lineStyle(3, PALETTE.ink, 1);
-  // cape
-  g.fillStyle(PALETTE.blueDark, 1);
-  g.fillTriangle(x - 14, y, x + 14, y, x + sway, top + 20);
-  // tall mask
   g.fillStyle(PALETTE.blue, 1);
-  g.fillRoundedRect(x - 12 + sway, top, 24, 38, 10);
-  g.strokeRoundedRect(x - 12 + sway, top, 24, 38, 10);
-  // stripes pattern
-  g.fillStyle(PALETTE.ladderLight, 0.9);
-  g.fillRect(x - 12 + sway, top + 26, 24, 3);
-  g.fillRect(x - 12 + sway, top + 31, 24, 2);
-  // crown points
-  g.fillStyle(PALETTE.gold, 1);
-  g.fillTriangle(x - 10 + sway, top + 2, x - 4 + sway, top + 2, x - 7 + sway, top - 7);
-  g.fillTriangle(x + 4 + sway, top + 2, x + 10 + sway, top + 2, x + 7 + sway, top - 7);
-  g.fillTriangle(x - 3 + sway, top + 1, x + 3 + sway, top + 1, x + sway, top - 10);
-  // eye slits
-  if (p.stunned) {
-    eyes(g, x + sway, top + 15, p.dir, false, true);
-  } else {
-    g.fillStyle(PALETTE.ink, 1);
-    g.fillEllipse(x - 5 + sway + p.dir, top + 15, 7, 4);
-    g.fillEllipse(x + 5 + sway + p.dir, top + 15, 7, 4);
-    g.fillStyle(PALETTE.gold, 1);
-    g.fillCircle(x - 5 + sway + p.dir * 2, top + 15, 1.3);
-    g.fillCircle(x + 5 + sway + p.dir * 2, top + 15, 1.3);
+  // arms (behind body)
+  g.fillRoundedRect(bx - 22, top + 18, 12, 8, 4);
+  g.strokeRoundedRect(bx - 22, top + 18, 12, 8, 4);
+  g.fillRoundedRect(bx - 22, top + 6, 8, 18, 4);
+  g.strokeRoundedRect(bx - 22, top + 6, 8, 18, 4);
+  g.fillRoundedRect(bx + 10, top + 24, 12, 8, 4);
+  g.strokeRoundedRect(bx + 10, top + 24, 12, 8, 4);
+  g.fillRoundedRect(bx + 14, top + 12, 8, 18, 4);
+  g.strokeRoundedRect(bx + 14, top + 12, 8, 18, 4);
+  // tall body
+  g.fillRoundedRect(bx - 12, top, 24, 42, 11);
+  g.strokeRoundedRect(bx - 12, top, 24, 42, 11);
+  // ribs
+  g.lineStyle(2, PALETTE.blueDark, 0.9);
+  g.lineBetween(bx - 5, top + 6, bx - 5, top + 38);
+  g.lineBetween(bx + 5, top + 6, bx + 5, top + 38);
+  // spines
+  g.lineStyle(1.5, PALETTE.white, 0.95);
+  for (const [sx, sy] of [[-12, 26], [12, 30], [-12, 36], [12, 14], [-19, 10], [18, 16]] as const) {
+    g.lineBetween(bx + sx, top + sy, bx + sx + (sx < 0 ? -4 : 4), top + sy - 2);
   }
+  // flower on top
+  g.fillStyle(PINK, 1);
+  for (let i = 0; i < 5; i++) {
+    const a = (i * Math.PI * 2) / 5 - Math.PI / 2;
+    g.fillCircle(bx + Math.cos(a) * 5, top - 2 + Math.sin(a) * 5, 3.5);
+  }
+  g.fillStyle(PALETTE.gold, 1);
+  g.fillCircle(bx, top - 2, 3);
+  eyes(g, bx, top + 14, p.dir, true, p.stunned);
 }
 
 /** Dizzy stars orbiting a trapped enemy's head. */

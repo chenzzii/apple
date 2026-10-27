@@ -24,7 +24,7 @@ Esc/P pause · 1–4 world speed (1.0/1.25/1.5/2.0x) · R restart · N mute all 
 
 Music: two original chiptune-style loops generated live with Web Audio (`src/game/music/score.ts`) — no audio files.
 
-Walking onto an open hole drops **you** to the floor below too. Enemies: red apple needs a 1-floor fall, green butterfly 2, blue mask 3 — in one continuous fall through holes in the **same column**.
+Walking onto an open hole drops **you** to the floor below too. Enemies are plants: red apple needs a 1-floor fall, green flytrap 2, blue cactus 3 — in one continuous fall through holes in the **same column**.
 
 ## Develop
 ```bash
