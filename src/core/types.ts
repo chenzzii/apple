@@ -40,10 +40,10 @@ export interface InputFrame {
   right: boolean;
   up: boolean;
   down: boolean;
-  /** J (modern): dig the tile to the LEFT, or pound if an enemy is trapped there. */
+  /** J (modern): act on the LEFT tile — dig if solid, fill if open, pound if an enemy is trapped. */
   digLeftHeld: boolean;
   digLeftPressed: boolean;
-  /** K (modern): dig the tile to the RIGHT, or pound if an enemy is trapped there. */
+  /** K (modern): act on the RIGHT tile — dig if solid, fill if open, pound if an enemy is trapped. */
   digRightHeld: boolean;
   digRightPressed: boolean;
 }
@@ -96,6 +96,8 @@ export interface LevelData {
 export type GameEvent =
   | { type: 'hole-dig-progress'; floor: number; col: number; progress: number }
   | { type: 'hole-opened'; floor: number; col: number }
+  | { type: 'hole-fill-progress'; floor: number; col: number; progress: number }
+  | { type: 'hole-filled'; floor: number; col: number }
   | { type: 'player-fall-started'; floor: number; col: number }
   | { type: 'player-landed'; floor: number }
   | { type: 'enemy-trapped'; enemyId: number; floor: number; col: number }

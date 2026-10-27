@@ -235,6 +235,14 @@ export class GameScene extends Phaser.Scene {
         sfx.holeOpen();
         this.burst(cx(ev.col), fy(ev.floor) + 6, PALETTE.brick, 14, 160);
         break;
+      case 'hole-fill-progress':
+        sfx.fill();
+        this.burst(cx(ev.col), fy(ev.floor) + 2, PALETTE.grassTop, 4, 70);
+        break;
+      case 'hole-filled':
+        sfx.holeFilled();
+        this.burst(cx(ev.col), fy(ev.floor), PALETTE.grassTop, 10, 110);
+        break;
       case 'player-fall-started':
         sfx.playerFall();
         break;
@@ -440,16 +448,19 @@ export class GameScene extends Phaser.Scene {
         txt.setVisible(false);
         continue;
       }
-      const tile = sim.map.tile(p.floor, col);
-      const trapped = tile?.trappedEnemyId != null;
       const ok = sim.map.canDig(p.floor, col);
+      // What the key will do on this tile: 挖 dig / 補 fill / 敲 pound.
+      const hs = sim.map.holeState(p.floor, col);
+      const mode = hs === 'OCCUPIED' || hs === 'POUNDING' ? 'pound' : hs === 'OPEN' || hs === 'REFILLING' ? 'fill' : 'dig';
+      const color = mode === 'pound' ? PALETTE.gold : mode === 'fill' ? PALETTE.good : PALETTE.white;
       const tx = OX + col * TILE;
       const ty = OY + lv.floorY[p.floor]!;
-      g.lineStyle(3, ok ? (trapped ? PALETTE.gold : PALETTE.white) : PALETTE.bad, ok ? 0.85 : 0.45);
+      g.lineStyle(3, ok ? color : PALETTE.bad, ok ? 0.85 : 0.45);
       g.strokeRoundedRect(tx + 1, ty - 2, TILE - 2, FLOOR_THICK + 4, 4);
+      const verb = mode === 'pound' ? '敲' : mode === 'fill' ? '補' : '挖';
       txt
-        .setText(ok ? `${label}${trapped ? ' 敲' : ''}` : '✕')
-        .setColor(trapped ? '#ffe066' : ok ? '#ffffff' : '#ff8a8a')
+        .setText(ok ? `${label} ${verb}` : '✕')
+        .setColor(!ok ? '#ff8a8a' : mode === 'pound' ? '#ffe066' : mode === 'fill' ? '#7dff96' : '#ffffff')
         .setPosition(tx + TILE / 2, ty + FLOOR_THICK + 3)
         .setVisible(true);
     }
@@ -610,9 +621,11 @@ export class GameScene extends Phaser.Scene {
         '',
         `移動  ${km.move}`,
         `爬梯  ${km.climb}`,
-        `向左挖  ${km.digLeft}`,
-        `向右挖  ${km.digRight}`,
-        '（有敵人=敲下去）',
+        `左邊一格  ${km.digLeft}`,
+        `右邊一格  ${km.digRight}`,
+        '同一鍵：',
+        ' 地板→挖 洞→補',
+        ' 有敵人→敲下去',
         '（沒有跳躍）',
         '',
         '暫停  Esc / P',
@@ -666,9 +679,10 @@ export class GameScene extends Phaser.Scene {
       title = '怎麼玩';
       body = [
         `${km.move} 左右走，在梯子前按 ${km.climb} 爬梯（沒有跳躍）`,
-        `按 ${km.digLeft} 挖左邊一格、按 ${km.digRight} 挖右邊一格，各要 6 下`,
+        `${km.digLeft} 對左邊一格、${km.digRight} 對右邊一格動作，每個動作都要 6 下：`,
+        '　地板 → 挖洞　　已經有洞 → 補起來　　洞裡困著敵人 → 敲下去',
         '敵人走到洞上會掉進去被困住（約 5 秒後會爬出來）',
-        `洞裡有敵人時，同一個鍵改成敲擊：再按 6 下把牠敲下去`,
+        '長按時，挖好／補好／敲落後會自動停住，放開再按才會繼續',
         '紅蘋果掉 1 層、綠蝴蝶 2 層、藍面具 3 層才會消滅',
         '要連續掉多層：下面樓層同一直行也要先挖好洞',
         '小心！自己走到挖好的洞上，也會掉到下一層',

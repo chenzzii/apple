@@ -1,5 +1,5 @@
-// Browser check via REAL keyboard: in the mechanics level, dig right with K (6 pulses),
-// then walk right onto the hole. The col-10 shaft has preset holes on floors 1 and 2,
+// Browser check via REAL keyboard: in the mechanics level, dig right with K (6 pulses), fill it
+// back with K (6 pulses), dig it again, then walk right onto the hole. The col-10 shaft has preset holes on floors 1 and 2,
 // so the gardener should drop straight from floor 0 to floor 3 without losing a life.
 // Usage: npm run dev, then node tools/playtest/player-falls.cjs
 require('fs').mkdirSync('test-artifacts', { recursive: true });
@@ -18,7 +18,16 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const read = () => p.evaluate(() => { const s = window.__orchard.sim; return { status: s.status, x: s.player.x, floor: s.player.floor, state: s.player.state, lives: s.lives, h: s.map.holeState(0, 10) }; });
   await p.waitForFunction(() => window.__orchard && window.__orchard.sim.status === 'PLAYING');
   const start = await read();
+  // K x6: dig the right tile open; K x6 again: same key fills it back; K x6: dig it open again.
   for (let i = 0; i < 6; i++) { await p.keyboard.press('k'); await sleep(180); }
+  const afterFirstDig = await read();
+  for (let i = 0; i < 6; i++) { await p.keyboard.press('k'); await sleep(180); }
+  const afterFill = await read();
+  // Restart the level (R) so the walking/falling part starts before any enemy arrives.
+  await p.keyboard.press('r');
+  await sleep(300);
+  await p.waitForFunction(() => window.__orchard && window.__orchard.sim.status === 'PLAYING');
+  for (let i = 0; i < 6; i++) { await p.keyboard.press('k'); await sleep(130); }
   const afterDig = await read();
   await p.screenshot({ path: 'test-artifacts/fall-01-dug.png' });
   await p.keyboard.down('ArrowRight');
@@ -33,6 +42,6 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   await sleep(300);
   const end = await read();
   await p.screenshot({ path: 'test-artifacts/fall-03-landed.png' });
-  console.log(JSON.stringify({ start, afterDig, sawFalling, end, errors: errs }, null, 1));
+  console.log(JSON.stringify({ start, afterFirstDig: afterFirstDig.h, afterFill: afterFill.h, afterDig, sawFalling, end, errors: errs }, null, 1));
   await b.close();
 })();

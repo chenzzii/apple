@@ -125,7 +125,7 @@ export class MenuScene extends Phaser.Scene {
     const km = KEYMAP_HELP[settings.keymap];
     this.info.setText(
       [
-        `鍵位：${settings.keymap === 'modern' ? '現代（方向鍵/WASD + J 向左挖 K 向右挖）' : '原典（I J K M 移動 + A 向左挖 S 向右挖）'}　［C 切換］`,
+        `鍵位：${settings.keymap === 'modern' ? '現代（方向鍵/WASD + J 左 / K 右：挖・補・敲）' : '原典（I J K M 移動 + A 左 / S 右：挖・補・敲）'}　［C 切換］`,
         `世界速度：${settings.speed.toFixed(2)}x　［1 = 1.0　2 = 1.25　3 = 1.5　4 = 2.0］`,
       ].join('\n'),
     );
@@ -134,8 +134,8 @@ export class MenuScene extends Phaser.Scene {
         '操作說明',
         '',
         `移動：${km.move}　　爬梯：${km.climb}（沒有跳躍）`,
-        `向左挖：${km.digLeft}　　向右挖：${km.digRight}（連按/長按 6 次挖開）`,
-        '那一格洞裡困著敵人時，同一個鍵改成敲擊（6 下敲落）',
+        `${km.digLeft}：對左邊一格　　${km.digRight}：對右邊一格（每個動作 6 下）`,
+        '　地板 → 挖洞　已經有洞 → 補起來　困著敵人 → 敲下去',
         '注意：走到挖好的洞上，自己也會掉到下一層！',
         '',
         '紅蘋果：連續掉 1 層消滅（每層 100 分）',

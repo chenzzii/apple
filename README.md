@@ -15,8 +15,10 @@ Open the URL Vite prints. **Enter** starts level 1, **T** opens the mechanics te
 |---|---|---|
 | Move | ← → / A D | J K |
 | Climb | ↑ ↓ / W S | I M |
-| Dig LEFT tile (6 pulses) — pounds instead if an enemy is trapped there | J | A |
-| Dig RIGHT tile (6 pulses) — pounds instead if an enemy is trapped there | K | S |
+| Act on the LEFT tile | J | A |
+| Act on the RIGHT tile | K | S |
+
+One key, three actions (6 pulses each): solid floor → **dig**, existing hole → **fill**, trapped enemy → **pound it down**. A held key pauses after each completed action; release and press again to continue.
 
 Esc/P pause · 1–4 world speed (1.0/1.25/1.5/2.0x) · R restart · N mute · C (menu) switch keymap.
 

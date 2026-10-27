@@ -8,7 +8,14 @@ npm install
 npm run dev        # open the printed http://localhost:5173 URL
 ```
 Menu: **Enter** start level 1 · **T** mechanics test level · **H** help · **C** switch keymap · **1–4** world speed (1.0 / 1.25 / 1.5 / 2.0x).
-In game: arrows/WASD move & climb, **J** dig/pound LEFT tile, **K** dig/pound RIGHT tile (classic keymap: I/J/K/M + A/S) · **Esc/P** pause · **H** help · **R** restart · **N** mute · **G** re-open test holes (test level only).
+In game: arrows/WASD move & climb, **J** LEFT tile / **K** RIGHT tile — dig solid floor, fill an open hole, pound a trapped enemy (classic keymap: I/J/K/M + A/S) · **Esc/P** pause · **H** help · **R** restart · **N** mute · **G** re-open test holes (test level only).
+
+## 2026-10-27 (2) — same key digs, fills or pounds (owner request)
+- J/K: solid or partly dug tile → dig; open hole → fill (6 pulses, like pounding); trapped enemy → pound. Fill action is back.
+- Held key locks after a completed action until released; taps during the cooldown are buffered.
+- Target labels show 挖 / 補 / 敲 per side; help, menu, side panel updated.
+- `npm run typecheck` ✅ · `npm run test` ✅ **38 tests** (new: fill in 6, partly dug keeps digging, hold-lock after open / knock-through, tap buffering) · `npm run build` ✅
+- Browser (real keys): K×6 open → K×6 fill (SOLID) → K×6 open → walk → fell floor 0→3; level 1 cleared; pause/speed/tab-hide/loss/retry pass; mechanics level cleared (blue 3, green 2, red 1); 0 console errors.
 
 ## 2026-10-27 — controls + hole-fall change (owner request)
 - J = dig the LEFT tile, K = dig the RIGHT tile; the same key pounds if an enemy is trapped in that tile. Fill-hole action removed.

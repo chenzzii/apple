@@ -19,6 +19,14 @@ const out = {};
     for (const k of [...held]) if (!keys.includes(k)) { await p.keyboard.up(k); held.delete(k); }
     for (const k of keys) if (!held.has(k)) { await p.keyboard.down(k); held.add(k); }
   }
+  // Like a human: when switching to a different purpose (dig -> pound -> dig ...), release first,
+  // because a held J/K is locked after an action completes.
+  let lastPurpose = '';
+  async function act(key, purpose) {
+    if (purpose !== lastPurpose && held.has(key)) { await hold([]); await sleep(40); }
+    lastPurpose = purpose;
+    await hold([key]);
+  }
   async function tap(k) { await hold([]); await p.keyboard.down(k); await sleep(15); await p.keyboard.up(k); }
   const read = () => p.evaluate(() => {
     const s = window.__orchard.sim;
@@ -134,11 +142,11 @@ const out = {};
       if (trapped) {
         if (!shotTrapped) { shotTrapped = true; await p.screenshot({ path: 'test-artifacts/13-blue-or-green-trapped.png' }); }
         const want = trapped.trapCol > 9 ? 1 : -1;
-        await hold([want === 1 ? 'k' : 'j']); // same key pounds when an enemy is trapped there
+        await act(want === 1 ? 'k' : 'j', 'pound' + trapped.trapCol); // same key pounds when an enemy is trapped there
       } else if (holes.h10 !== 'OPEN' && holes.h10 !== 'OCCUPIED') {
-        await hold(['k']); // K = dig right
+        await act('k', 'dig-right'); // K = dig right
       } else if (holes.h8 !== 'OPEN' && holes.h8 !== 'OCCUPIED') {
-        await hold(['j']); // J = dig left
+        await act('j', 'dig-left'); // J = dig left
       } else await hold([]);
     } else {
       // red on lower floors: ambush on floor 3 at col 9 like level 1 (holes at 3,8 / 3,10)
@@ -146,9 +154,9 @@ const out = {};
       const st = await p.evaluate(() => { const m = window.__orchard.sim.map; return { a: m.holeState(3, 10), b: m.holeState(3, 8) }; });
       if (trapped) {
         const want = trapped.trapCol > 9 ? 1 : -1;
-        await hold([want === 1 ? 'k' : 'j']); // same key pounds when an enemy is trapped there
-      } else if (st.a !== 'OPEN' && st.a !== 'OCCUPIED') { await hold(['k']); /* K = dig right */ }
-      else if (st.b !== 'OPEN' && st.b !== 'OCCUPIED') { await hold(['j']); /* J = dig left */ }
+        await act(want === 1 ? 'k' : 'j', 'pound' + trapped.trapCol); // same key pounds when an enemy is trapped there
+      } else if (st.a !== 'OPEN' && st.a !== 'OCCUPIED') { await act('k', 'dig-right3'); /* K = dig right */ }
+      else if (st.b !== 'OPEN' && st.b !== 'OCCUPIED') { await act('j', 'dig-left3'); /* J = dig left */ }
       else await hold([]);
     }
     await sleep(20);

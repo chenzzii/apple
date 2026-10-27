@@ -35,6 +35,13 @@ describe('trap / escape / pound (T06/T07)', () => {
     expect(e.state).toBe('FALLING');
   });
 
+  it('holding K after the knock-through does not start digging the sealed tile', () => {
+    const sim = trapScenario('red', []);
+    for (let i = 0; i < 200; i++) sim.step(input({ digRightHeld: true }));
+    expect(sim.enemies[0]!.state).toBe('DEFEATED');
+    expect(sim.map.holeState(0, 10)).toBe('SOLID');
+  });
+
   it('pounding after release cannot score twice', () => {
     const sim = trapScenario('red', []);
     sim.drainEvents();
