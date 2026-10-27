@@ -22,6 +22,14 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     for (const k of [...held]) if (!keys.includes(k)) { await p.keyboard.up(k); held.delete(k); }
     for (const k of keys) if (!held.has(k)) { await p.keyboard.down(k); held.add(k); }
   }
+  // Like a human: when switching to a different purpose (dig -> pound -> dig ...), release first,
+  // because a held J/K is locked after an action completes.
+  let lastPurpose = '';
+  async function act(key, purpose) {
+    if (purpose !== lastPurpose && held.has(key)) { await hold([]); await sleep(40); }
+    lastPurpose = purpose;
+    await hold([key]);
+  }
   async function tap(k) { await hold([]); await p.keyboard.down(k); await sleep(15); await p.keyboard.up(k); }
   const read = () => p.evaluate(() => {
     const s = window.__orchard.sim;
@@ -68,11 +76,11 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       else if (x > 392) await hold(['ArrowLeft']);
       else if (trapped) {
         const want = trapped.trapCol === 10 ? 1 : -1;
-        await hold([want === 1 ? 'k' : 'j']); // same key pounds when an enemy is trapped there
+        await act(want === 1 ? 'k' : 'j', 'pound' + trapped.trapCol); // same key pounds when an enemy is trapped there
       } else if (s.h10 !== 'OPEN' && s.h10 !== 'OCCUPIED') {
-        await hold(['k']); // K = dig right
+        await act('k', 'dig-right'); // K = dig right
       } else if (s.h8 !== 'OPEN' && s.h8 !== 'OCCUPIED') {
-        await hold(['j']); // J = dig left
+        await act('j', 'dig-left'); // J = dig left
       } else await hold([]);
     } else {
       // On another floor (should not happen in this plan): head down via any ladder by waiting.

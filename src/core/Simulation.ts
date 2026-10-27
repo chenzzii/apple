@@ -30,6 +30,10 @@ export interface Player {
   lastAction: 'dig' | 'pound' | null;
   /** Floor index the player is falling toward (only while FALLING). */
   fallTarget: number;
+  /** Held J (-1) / K (1) ignored until released, after an action completed. 0 = none. */
+  holdLock: -1 | 0 | 1;
+  /** A J (-1) / K (1) tap received during the cooldown, executed when it ends. 0 = none. */
+  bufferedPress: -1 | 0 | 1;
 }
 
 export interface Enemy {
@@ -118,7 +122,7 @@ export class Simulation {
     this.statusTimer = this.s.ready;
     this.player = {
       x: 0, y: 0, prevX: 0, prevY: 0, floor: 0, ladder: null, facing: 1, state: 'IDLE',
-      invulnSteps: 0, cooldownSteps: 0, actionAnimSteps: 0, lastAction: null, fallTarget: 0,
+      invulnSteps: 0, cooldownSteps: 0, actionAnimSteps: 0, lastAction: null, fallTarget: 0, holdLock: 0, bufferedPress: 0,
     };
     this.enemies = level.enemies.map((spawn, i) => ({
       id: i + 1, kind: spawn.kind, spawn, x: 0, y: 0, prevX: 0, prevY: 0, floor: 0, dir: 1 as Dir,
@@ -236,6 +240,8 @@ export class Simulation {
     p.actionAnimSteps = 0;
     p.lastAction = null;
     p.fallTarget = 0;
+    p.holdLock = 0;
+    p.bufferedPress = 0;
     for (const e of this.enemies) {
       if (!initial && e.state === 'DEFEATED') continue;
       e.floor = e.spawn.floor;
@@ -308,16 +314,27 @@ export class Simulation {
       if (this.startPlayerFallIfOverHole()) return;
     }
 
-    // J = act on the LEFT tile, K = act on the RIGHT tile. Each pulse digs, or pounds
-    // if that tile holds a trapped enemy. Only while standing on a floor.
+    // J = act on the LEFT tile, K = act on the RIGHT tile. What a pulse does depends on
+    // that tile: solid/partly dug -> dig; open hole -> fill; trapped enemy -> pound.
+    // After an action COMPLETES (opened / filled / knocked through) a held key is locked
+    // until released, so holding K never rolls straight from digging into filling.
+    if (p.holdLock === -1 && !input.digLeftHeld) p.holdLock = 0;
+    if (p.holdLock === 1 && !input.digRightHeld) p.holdLock = 0;
+    // A tap that lands during the cooldown is buffered (one deep) so fast tapping never loses presses.
+    if (input.digLeftPressed) p.bufferedPress = -1;
+    else if (input.digRightPressed) p.bufferedPress = 1;
     if (p.cooldownSteps === 0) {
-      const left = input.digLeftPressed || input.digLeftHeld;
-      const right = input.digRightPressed || input.digRightHeld;
+      const bufL = p.bufferedPress === -1;
+      const bufR = p.bufferedPress === 1;
+      const left = bufL || (!bufR && input.digLeftHeld && p.holdLock !== -1);
+      const right = bufR || (!bufL && input.digRightHeld && p.holdLock !== 1);
       if (left || right) {
         const dir: Dir = left ? -1 : 1;
-        const explicit = left ? input.digLeftPressed : input.digRightPressed;
+        const explicit = left ? bufL : bufR;
+        p.bufferedPress = 0;
         p.facing = dir;
-        this.actPulse(dir, explicit);
+        if (explicit) p.holdLock = 0;
+        if (this.actPulse(dir, explicit)) p.holdLock = dir;
         p.cooldownSteps = this.s.pulseCooldown;
       }
     }
@@ -356,35 +373,62 @@ export class Simulation {
     }
   }
 
-  /** One dig/pound pulse on the tile at the player's column + dir. */
-  private actPulse(dir: Dir, explicit: boolean): void {
+  /**
+   * One J/K pulse on the tile at the player's column + dir.
+   * Returns true when this pulse COMPLETED an action (hole opened, hole filled, enemy knocked through).
+   */
+  private actPulse(dir: Dir, explicit: boolean): boolean {
     const p = this.player;
     const col = MapGrid.colOf(p.x) + dir;
     const f = p.floor;
     const t = this.map.canDig(f, col) ? this.map.ensureTile(f, col) : undefined;
-    if (t && t.trappedEnemyId !== null) {
+    if (!t) {
+      if (explicit) this.emit({ type: 'invalid-action', action: 'dig' });
+      return false;
+    }
+    // 1) Trapped enemy -> pound it through.
+    if (t.trappedEnemyId !== null) {
       const enemy = this.enemies.find((e) => e.id === t.trappedEnemyId);
       if (!enemy || enemy.state !== 'TRAPPED') {
         if (explicit) this.emit({ type: 'invalid-action', action: 'pound' });
-        return;
+        return false;
       }
       t.poundProgress++;
       p.lastAction = 'pound';
       p.actionAnimSteps = 8;
       this.emit({ type: 'hole-pound-progress', enemyId: enemy.id, floor: f, col, progress: t.poundProgress });
-      if (t.poundProgress >= this.cfg.poundPulses) this.knockThrough(enemy, t);
-      return;
+      if (t.poundProgress >= this.cfg.poundPulses) {
+        this.knockThrough(enemy, t);
+        return true;
+      }
+      return false;
     }
-    if (!t || t.progress >= this.cfg.digPulses) {
-      if (explicit) this.emit({ type: 'invalid-action', action: 'dig' });
-      return;
+    // 2) Open hole (or a fill already in progress) -> fill it back, same pulse count as pounding.
+    if (t.progress >= this.cfg.digPulses || (t.lastAction === 'fill' && t.progress > 0)) {
+      const step = this.cfg.digPulses / this.cfg.poundPulses;
+      t.progress = Math.max(0, t.progress - step);
+      t.lastAction = 'fill';
+      p.lastAction = 'pound';
+      p.actionAnimSteps = 8;
+      this.emit({ type: 'hole-fill-progress', floor: f, col, progress: t.progress });
+      if (t.progress <= 0) {
+        this.map.fill(f, col);
+        this.emit({ type: 'hole-filled', floor: f, col });
+        return true;
+      }
+      return false;
     }
+    // 3) Solid or partly dug -> dig.
     t.progress++;
     t.lastAction = 'dig';
     p.lastAction = 'dig';
     p.actionAnimSteps = 8;
     this.emit({ type: 'hole-dig-progress', floor: f, col, progress: t.progress });
-    if (t.progress >= this.cfg.digPulses) this.emit({ type: 'hole-opened', floor: f, col });
+    if (t.progress >= this.cfg.digPulses) {
+      this.emit({ type: 'hole-opened', floor: f, col });
+      return true;
+    }
+    return false;
   }
 
   private knockThrough(e: Enemy, t: Tile): void {

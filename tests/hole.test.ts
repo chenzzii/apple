@@ -67,11 +67,66 @@ describe('digging with J (left) / K (right) (T02/T03)', () => {
     expect(sim.map.holeState(4, 10)).toBe('SOLID');
   });
 
-  it('extra pulses on an already open hole do nothing', () => {
+  it('on an open hole the same key fills it back in 6 pulses, then digs again', () => {
     const sim = digSim();
-    for (let i = 0; i < 9; i++) tap(sim, 'right');
-    expect(sim.map.tile(1, 10)!.progress).toBe(6);
+    for (let i = 0; i < 6; i++) tap(sim, 'right');
     expect(sim.map.holeState(1, 10)).toBe('OPEN');
+    tap(sim, 'right'); // 7th tap: hole already exists -> start filling
+    expect(sim.map.holeState(1, 10)).toBe('REFILLING');
+    expect(sim.map.tile(1, 10)!.progress).toBe(5);
+    for (let i = 0; i < 4; i++) tap(sim, 'right');
+    expect(sim.map.holeState(1, 10)).toBe('REFILLING');
+    tap(sim, 'right'); // 6th fill pulse
+    expect(sim.map.holeState(1, 10)).toBe('SOLID');
+    const ev = sim.drainEvents();
+    expect(ev.filter((e) => e.type === 'hole-fill-progress')).toHaveLength(6);
+    expect(ev.filter((e) => e.type === 'hole-filled')).toHaveLength(1);
+    tap(sim, 'right'); // solid again -> digs
+    expect(sim.map.holeState(1, 10)).toBe('DIGGING');
+    expect(sim.map.tile(1, 10)!.progress).toBe(1);
+  });
+
+  it('a partly dug tile keeps digging (does not switch to filling)', () => {
+    const sim = digSim();
+    for (let i = 0; i < 3; i++) tap(sim, 'right');
+    tap(sim, 'right');
+    expect(sim.map.tile(1, 10)!.progress).toBe(4);
+    expect(sim.map.holeState(1, 10)).toBe('DIGGING');
+  });
+
+  it('fast taps during the cooldown are buffered, not lost', () => {
+    const sim = digSim();
+    // 6 taps, one every 3 steps (50 ms) — faster than the 7-step cooldown.
+    for (let k = 0; k < 6; k++) {
+      sim.step(input({ digRightPressed: true, digRightHeld: true }));
+      sim.step(input());
+      sim.step(input());
+    }
+    for (let i = 0; i < 60; i++) sim.step(input());
+    // Buffer is one deep: some rapid taps merge, but the last tap is never dropped.
+    expect(sim.map.tile(1, 10)!.progress).toBeGreaterThanOrEqual(3);
+    expect(sim.map.tile(1, 10)!.progress).toBeLessThanOrEqual(6);
+  });
+
+  it('taps at a human pace (every 130 ms) each count', () => {
+    const sim = digSim();
+    for (let k = 0; k < 6; k++) {
+      sim.step(input({ digRightPressed: true, digRightHeld: true }));
+      for (let i = 0; i < 7; i++) sim.step(input()); // 8 steps ≈ 133 ms
+    }
+    expect(sim.map.holeState(1, 10)).toBe('OPEN');
+  });
+
+  it('holding the key stops after the hole opens; release + press starts filling', () => {
+    const sim = digSim();
+    for (let i = 0; i < 120; i++) sim.step(input({ digRightHeld: true }));
+    expect(sim.map.holeState(1, 10)).toBe('OPEN');
+    expect(sim.map.tile(1, 10)!.progress).toBe(6);
+    sim.step(input()); // release
+    for (let i = 0; i < 10; i++) sim.step(input());
+    for (let i = 0; i < 120; i++) sim.step(input({ digRightHeld: true, digRightPressed: i === 0 }));
+    expect(sim.map.holeState(1, 10)).toBe('SOLID'); // filled by holding, then locked again
+    expect(sim.map.tile(1, 10)!.progress).toBe(0);
   });
 
   it('walking into your own freshly dug hole drops you a floor', () => {
