@@ -6,6 +6,8 @@ export interface Settings {
   keymap: Keymap;
   speed: SpeedOption;
   muted: boolean;
+  /** Background music on/off (independent of sound effects). */
+  music: boolean;
 }
 
 const KEY = 'orchard-panic.settings.v1';
@@ -13,7 +15,7 @@ const KEY = 'orchard-panic.settings.v1';
 export const settings: Settings = load();
 
 function load(): Settings {
-  const d: Settings = { keymap: 'modern', speed: DEFAULT_SPEED, muted: false };
+  const d: Settings = { keymap: 'modern', speed: DEFAULT_SPEED, muted: false, music: true };
   try {
     const raw = localStorage.getItem(KEY);
     if (!raw) return d;
@@ -22,6 +24,7 @@ function load(): Settings {
       keymap: s.keymap === 'classic' ? 'classic' : 'modern',
       speed: (SPEED_OPTIONS as readonly number[]).includes(s.speed as number) ? (s.speed as SpeedOption) : d.speed,
       muted: !!s.muted,
+      music: s.music !== false,
     };
   } catch {
     return d;

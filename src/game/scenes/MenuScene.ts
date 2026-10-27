@@ -4,6 +4,7 @@ import { PALETTE, drawEnemy, drawGardener } from '../../rendering/VectorArt';
 import { FONT, GAME_H, GAME_W } from '../constants';
 import { KEYMAP_HELP, saveSettings, settings } from '../Settings';
 import { sfx } from '../Sfx';
+import { music } from '../music/Music';
 
 export class MenuScene extends Phaser.Scene {
   private info!: Phaser.GameObjects.Text;
@@ -65,6 +66,8 @@ export class MenuScene extends Phaser.Scene {
 
   override update(_t: number, dt: number): void {
     this.t += dt / 1000;
+    music.tempo = 1;
+    music.want('menu');
     const g = this.art;
     g.clear();
     const px = 200 + ((this.t * 90) % 900);
@@ -92,6 +95,11 @@ export class MenuScene extends Phaser.Scene {
       case 'KeyH':
       case 'F1':
         this.toggleHelp();
+        break;
+      case 'KeyB':
+        settings.music = !settings.music;
+        saveSettings();
+        this.refresh();
         break;
       case 'KeyC':
         settings.keymap = settings.keymap === 'modern' ? 'classic' : 'modern';
@@ -127,6 +135,7 @@ export class MenuScene extends Phaser.Scene {
       [
         `鍵位：${settings.keymap === 'modern' ? '現代（方向鍵/WASD + J 左 / K 右：挖・補・敲）' : '原典（I J K M 移動 + A 左 / S 右：挖・補・敲）'}　［C 切換］`,
         `世界速度：${settings.speed.toFixed(2)}x　［1 = 1.0　2 = 1.25　3 = 1.5　4 = 2.0］`,
+        `背景音樂：${settings.music ? '開' : '關'}　［B 切換］　（按任一鍵後開始播放）`,
       ].join('\n'),
     );
     this.help.setText(
@@ -143,7 +152,7 @@ export class MenuScene extends Phaser.Scene {
         '藍面具：連續掉 3 層消滅（每層 300 分）',
         '多層掉落需要下面樓層「同一直行」也有洞。',
         '',
-        '遊戲中：Esc/P 暫停　1–4 調速　R 重來　N 靜音',
+        '遊戲中：Esc/P 暫停　1–4 調速　R 重來　N 靜音　B 音樂開關',
         '',
         'H / Esc 關閉',
       ].join('\n'),

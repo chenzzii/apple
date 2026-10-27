@@ -10,6 +10,7 @@ import { FONT, GAME_H, GAME_W } from '../constants';
 import { InputController } from '../InputController';
 import { KEYMAP_HELP, saveSettings, settings } from '../Settings';
 import { sfx } from '../Sfx';
+import { music } from '../music/Music';
 
 /** Stage origin inside the 1280x720 design canvas. */
 const OX = (GAME_W - WORLD_W) / 2;
@@ -142,6 +143,17 @@ export class GameScene extends Phaser.Scene {
     this.render(this.clock.alpha);
     this.updateHud();
     this.updateOverlay();
+    this.syncMusic();
+  }
+
+  /** BGM follows the game state: plays while READY/PLAYING, silent when paused, hit, cleared or over. */
+  private syncMusic(): void {
+    const st = this.sim.status;
+    const active = !this.paused && (st === 'PLAYING' || st === 'READY');
+    // Tempo follows world speed (half as strongly) and speeds up when time is running out.
+    const hurry = st === 'PLAYING' && this.sim.timeLeftSec <= 20 ? 1.2 : 1;
+    music.tempo = (1 + (this.clock.speed - 1) * 0.5) * hurry;
+    music.want(active ? 'game' : null);
   }
 
   // ------------------------------------------------------------------ commands
@@ -175,6 +187,10 @@ export class GameScene extends Phaser.Scene {
         break;
       case 'KeyQ':
         if (this.paused || st === 'GAME_OVER' || st === 'LEVEL_CLEAR') this.scene.start('MenuScene');
+        break;
+      case 'KeyB':
+        settings.music = !settings.music;
+        saveSettings();
         break;
       case 'KeyN':
         settings.muted = !settings.muted;
@@ -600,7 +616,7 @@ export class GameScene extends Phaser.Scene {
     const km = KEYMAP_HELP[settings.keymap];
     const timeLeft = Math.ceil(sim.timeLeftSec);
     const avg = this.fpsSamples.reduce((a, b) => a + b, 0) / Math.max(1, this.fpsSamples.length);
-    const key = [sim.score, sim.lives, timeLeft, this.clock.speed, settings.keymap, sim.remainingEnemies, settings.muted, sim.status].join('|');
+    const key = [sim.score, sim.lives, timeLeft, this.clock.speed, settings.keymap, sim.remainingEnemies, settings.muted, settings.music, sim.status].join('|');
     this.texts.fps!.setText(`${(1000 / Math.max(1, avg)).toFixed(0)} fps (render) · logic 60 Hz`);
     if (key === this.hudCache) return;
     this.hudCache = key;
@@ -633,6 +649,7 @@ export class GameScene extends Phaser.Scene {
         '速度  1 2 3 4',
         '重來  R',
         `音效  N ${settings.muted ? '(關)' : '(開)'}`,
+        `音樂  B ${settings.music && !settings.muted ? '(開)' : '(關)'}`,
         ...(sim.level.debug ? ['', '重開測試洞  G'] : []),
       ].join('\n'),
     );
