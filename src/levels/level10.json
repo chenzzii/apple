@@ -1,0 +1,118 @@
+{
+  "id": "level10",
+  "name": "第 10 關：捕蠅草大溫室",
+  "cols": 24,
+  "floorY": [
+    112,
+    204,
+    296,
+    388,
+    480
+  ],
+  "diggableFloors": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "ladders": [
+    {
+      "col": 1,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 6,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 15,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 3,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 10,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 22,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 7,
+      "top": 2,
+      "bottom": 3
+    },
+    {
+      "col": 12,
+      "top": 2,
+      "bottom": 3
+    },
+    {
+      "col": 20,
+      "top": 2,
+      "bottom": 3
+    },
+    {
+      "col": 2,
+      "top": 3,
+      "bottom": 4
+    },
+    {
+      "col": 14,
+      "top": 3,
+      "bottom": 4
+    }
+  ],
+  "player": {
+    "col": 11,
+    "floor": 4
+  },
+  "enemies": [
+    {
+      "kind": "green",
+      "col": 7,
+      "floor": 0,
+      "dir": 1
+    },
+    {
+      "kind": "green",
+      "col": 13,
+      "floor": 1,
+      "dir": -1
+    },
+    {
+      "kind": "green",
+      "col": 16,
+      "floor": 0,
+      "dir": -1
+    },
+    {
+      "kind": "green",
+      "col": 17,
+      "floor": 1,
+      "dir": -1
+    },
+    {
+      "kind": "green",
+      "col": 12,
+      "floor": 0,
+      "dir": -1
+    }
+  ],
+  "timeLimitSec": 315,
+  "seed": 2036,
+  "theme": {
+    "skyTop": "#6fc0a8",
+    "skyBottom": "#f8ead0"
+  },
+  "hint": "五隻捕蠅草！準備好兩組對齊的洞再開始。"
+}

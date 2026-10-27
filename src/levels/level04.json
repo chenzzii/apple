@@ -1,0 +1,112 @@
+{
+  "id": "level04",
+  "name": "第 4 關：摘果平台",
+  "cols": 24,
+  "floorY": [
+    112,
+    204,
+    296,
+    388,
+    480
+  ],
+  "diggableFloors": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "ladders": [
+    {
+      "col": 5,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 10,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 20,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 2,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 7,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 12,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 4,
+      "top": 2,
+      "bottom": 3
+    },
+    {
+      "col": 10,
+      "top": 2,
+      "bottom": 3
+    },
+    {
+      "col": 8,
+      "top": 3,
+      "bottom": 4
+    },
+    {
+      "col": 14,
+      "top": 3,
+      "bottom": 4
+    },
+    {
+      "col": 20,
+      "top": 3,
+      "bottom": 4
+    }
+  ],
+  "player": {
+    "col": 11,
+    "floor": 4
+  },
+  "enemies": [
+    {
+      "kind": "red",
+      "col": 12,
+      "floor": 0,
+      "dir": -1
+    },
+    {
+      "kind": "red",
+      "col": 16,
+      "floor": 1,
+      "dir": -1
+    },
+    {
+      "kind": "red",
+      "col": 6,
+      "floor": 2,
+      "dir": 1
+    },
+    {
+      "kind": "red",
+      "col": 18,
+      "floor": 0,
+      "dir": -1
+    }
+  ],
+  "timeLimitSec": 210,
+  "seed": 2030,
+  "theme": {
+    "skyTop": "#9bc8ff",
+    "skyBottom": "#ffd9b0"
+  },
+  "hint": "洞挖錯了？同一個鍵再按 6 下就能補回去。"
+}

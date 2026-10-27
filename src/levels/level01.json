@@ -17,7 +17,7 @@
   ],
   "ladders": [
     {
-      "col": 4,
+      "col": 10,
       "top": 0,
       "bottom": 1
     },
@@ -27,12 +27,12 @@
       "bottom": 1
     },
     {
-      "col": 21,
-      "top": 0,
-      "bottom": 1
+      "col": 3,
+      "top": 1,
+      "bottom": 2
     },
     {
-      "col": 8,
+      "col": 12,
       "top": 1,
       "bottom": 2
     },
@@ -42,27 +42,32 @@
       "bottom": 2
     },
     {
-      "col": 2,
+      "col": 1,
       "top": 2,
       "bottom": 3
     },
     {
-      "col": 12,
+      "col": 10,
       "top": 2,
       "bottom": 3
     },
     {
-      "col": 22,
+      "col": 17,
       "top": 2,
       "bottom": 3
     },
     {
-      "col": 6,
+      "col": 3,
       "top": 3,
       "bottom": 4
     },
     {
-      "col": 17,
+      "col": 12,
+      "top": 3,
+      "bottom": 4
+    },
+    {
+      "col": 21,
       "top": 3,
       "bottom": 4
     }
@@ -74,24 +79,12 @@
   "enemies": [
     {
       "kind": "red",
-      "col": 10,
+      "col": 20,
       "floor": 0,
-      "dir": -1
-    },
-    {
-      "kind": "red",
-      "col": 3,
-      "floor": 1,
-      "dir": 1
-    },
-    {
-      "kind": "red",
-      "col": 17,
-      "floor": 2,
       "dir": -1
     }
   ],
-  "timeLimitSec": 150,
-  "seed": 1981,
+  "timeLimitSec": 120,
+  "seed": 2027,
   "hint": "紅蘋果掉 1 層就消滅：挖洞、等牠掉進去、再敲下去！"
 }

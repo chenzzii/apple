@@ -1,31 +1,86 @@
 {
   "id": "level02",
-  "name": "第 2 關：捕蠅草溫室",
+  "name": "第 2 關：蘋果小徑",
   "cols": 24,
-  "floorY": [112, 204, 296, 388, 480],
-  "diggableFloors": [0, 1, 2, 3],
+  "floorY": [
+    112,
+    204,
+    296,
+    388,
+    480
+  ],
+  "diggableFloors": [
+    0,
+    1,
+    2,
+    3
+  ],
   "ladders": [
-    { "col": 2, "top": 0, "bottom": 1 },
-    { "col": 13, "top": 0, "bottom": 1 },
-    { "col": 21, "top": 0, "bottom": 1 },
-    { "col": 5, "top": 1, "bottom": 2 },
-    { "col": 17, "top": 1, "bottom": 2 },
-    { "col": 1, "top": 2, "bottom": 3 },
-    { "col": 12, "top": 2, "bottom": 3 },
-    { "col": 20, "top": 2, "bottom": 3 },
-    { "col": 7, "top": 3, "bottom": 4 },
-    { "col": 15, "top": 3, "bottom": 4 }
+    {
+      "col": 5,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 21,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 3,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 13,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 9,
+      "top": 2,
+      "bottom": 3
+    },
+    {
+      "col": 16,
+      "top": 2,
+      "bottom": 3
+    },
+    {
+      "col": 3,
+      "top": 3,
+      "bottom": 4
+    },
+    {
+      "col": 14,
+      "top": 3,
+      "bottom": 4
+    },
+    {
+      "col": 22,
+      "top": 3,
+      "bottom": 4
+    }
   ],
-  "player": { "col": 11, "floor": 4 },
+  "player": {
+    "col": 11,
+    "floor": 4
+  },
   "enemies": [
-    { "kind": "green", "col": 6, "floor": 0, "dir": 1 },
-    { "kind": "green", "col": 18, "floor": 0, "dir": -1 },
-    { "kind": "red", "col": 3, "floor": 1, "dir": 1 },
-    { "kind": "red", "col": 19, "floor": 2, "dir": -1 }
+    {
+      "kind": "red",
+      "col": 4,
+      "floor": 0,
+      "dir": 1
+    },
+    {
+      "kind": "red",
+      "col": 12,
+      "floor": 1,
+      "dir": -1
+    }
   ],
-  "timeLimitSec": 200,
-  "seed": 2026,
-  "tuning": { "enemySpeed": 84 },
-  "theme": { "skyTop": "#9fe3c9", "skyBottom": "#fff4d6" },
-  "hint": "綠捕蠅草要連續掉 2 層：先在下一層挖洞，再回上一層挖對齊的洞！"
+  "timeLimitSec": 150,
+  "seed": 2028,
+  "hint": "兩隻紅蘋果：在牠們會經過的地方先挖好洞。"
 }

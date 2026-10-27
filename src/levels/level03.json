@@ -1,0 +1,101 @@
+{
+  "id": "level03",
+  "name": "第 3 關：果樹林",
+  "cols": 24,
+  "floorY": [
+    112,
+    204,
+    296,
+    388,
+    480
+  ],
+  "diggableFloors": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "ladders": [
+    {
+      "col": 4,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 9,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 19,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 2,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 17,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 4,
+      "top": 2,
+      "bottom": 3
+    },
+    {
+      "col": 13,
+      "top": 2,
+      "bottom": 3
+    },
+    {
+      "col": 19,
+      "top": 2,
+      "bottom": 3
+    },
+    {
+      "col": 1,
+      "top": 3,
+      "bottom": 4
+    },
+    {
+      "col": 7,
+      "top": 3,
+      "bottom": 4
+    }
+  ],
+  "player": {
+    "col": 11,
+    "floor": 4
+  },
+  "enemies": [
+    {
+      "kind": "red",
+      "col": 1,
+      "floor": 0,
+      "dir": 1
+    },
+    {
+      "kind": "red",
+      "col": 14,
+      "floor": 1,
+      "dir": -1
+    },
+    {
+      "kind": "red",
+      "col": 21,
+      "floor": 2,
+      "dir": -1
+    }
+  ],
+  "timeLimitSec": 180,
+  "seed": 2029,
+  "theme": {
+    "skyTop": "#8fd0ff",
+    "skyBottom": "#ffe3c2"
+  },
+  "hint": "小心別走進自己挖的洞，會掉到下一層！"
+}

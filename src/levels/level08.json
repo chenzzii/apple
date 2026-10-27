@@ -1,0 +1,113 @@
+{
+  "id": "level08",
+  "name": "第 8 關：濕地溫室",
+  "cols": 24,
+  "floorY": [
+    112,
+    204,
+    296,
+    388,
+    480
+  ],
+  "diggableFloors": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "ladders": [
+    {
+      "col": 4,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 9,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 1,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 6,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 14,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 4,
+      "top": 2,
+      "bottom": 3
+    },
+    {
+      "col": 16,
+      "top": 2,
+      "bottom": 3
+    },
+    {
+      "col": 22,
+      "top": 2,
+      "bottom": 3
+    },
+    {
+      "col": 9,
+      "top": 3,
+      "bottom": 4
+    },
+    {
+      "col": 18,
+      "top": 3,
+      "bottom": 4
+    }
+  ],
+  "player": {
+    "col": 11,
+    "floor": 4
+  },
+  "enemies": [
+    {
+      "kind": "green",
+      "col": 17,
+      "floor": 0,
+      "dir": -1
+    },
+    {
+      "kind": "green",
+      "col": 11,
+      "floor": 1,
+      "dir": 1
+    },
+    {
+      "kind": "green",
+      "col": 12,
+      "floor": 0,
+      "dir": -1
+    },
+    {
+      "kind": "red",
+      "col": 22,
+      "floor": 0,
+      "dir": -1
+    },
+    {
+      "kind": "red",
+      "col": 18,
+      "floor": 1,
+      "dir": -1
+    }
+  ],
+  "timeLimitSec": 285,
+  "seed": 2034,
+  "theme": {
+    "skyTop": "#8fd8c8",
+    "skyBottom": "#eaf6e0"
+  },
+  "hint": "捕蠅草變多了：先把對齊的洞準備好再引牠們過來。"
+}
