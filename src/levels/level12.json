@@ -1,0 +1,118 @@
+{
+  "id": "level12",
+  "name": "第 12 關：仙人掌小丘",
+  "cols": 24,
+  "floorY": [
+    112,
+    204,
+    296,
+    388,
+    480
+  ],
+  "diggableFloors": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "ladders": [
+    {
+      "col": 9,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 15,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 20,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 3,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 11,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 22,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 9,
+      "top": 2,
+      "bottom": 3
+    },
+    {
+      "col": 17,
+      "top": 2,
+      "bottom": 3
+    },
+    {
+      "col": 3,
+      "top": 3,
+      "bottom": 4
+    },
+    {
+      "col": 13,
+      "top": 3,
+      "bottom": 4
+    },
+    {
+      "col": 22,
+      "top": 3,
+      "bottom": 4
+    }
+  ],
+  "player": {
+    "col": 11,
+    "floor": 4
+  },
+  "enemies": [
+    {
+      "kind": "blue",
+      "col": 8,
+      "floor": 0,
+      "dir": 1
+    },
+    {
+      "kind": "blue",
+      "col": 21,
+      "floor": 1,
+      "dir": -1
+    },
+    {
+      "kind": "green",
+      "col": 4,
+      "floor": 0,
+      "dir": 1
+    },
+    {
+      "kind": "green",
+      "col": 14,
+      "floor": 1,
+      "dir": -1
+    },
+    {
+      "kind": "green",
+      "col": 18,
+      "floor": 0,
+      "dir": -1
+    }
+  ],
+  "timeLimitSec": 345,
+  "seed": 2038,
+  "theme": {
+    "skyTop": "#ffc98a",
+    "skyBottom": "#fbe9cf"
+  },
+  "hint": "三層對齊的洞也能一次解決捕蠅草，先把深洞準備好。"
+}

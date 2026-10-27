@@ -1,0 +1,108 @@
+{
+  "id": "level13",
+  "name": "第 13 關：日落沙丘",
+  "cols": 24,
+  "floorY": [
+    112,
+    204,
+    296,
+    388,
+    480
+  ],
+  "diggableFloors": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "ladders": [
+    {
+      "col": 11,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 16,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 2,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 14,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 8,
+      "top": 2,
+      "bottom": 3
+    },
+    {
+      "col": 16,
+      "top": 2,
+      "bottom": 3
+    },
+    {
+      "col": 21,
+      "top": 2,
+      "bottom": 3
+    },
+    {
+      "col": 6,
+      "top": 3,
+      "bottom": 4
+    },
+    {
+      "col": 14,
+      "top": 3,
+      "bottom": 4
+    }
+  ],
+  "player": {
+    "col": 11,
+    "floor": 4
+  },
+  "enemies": [
+    {
+      "kind": "blue",
+      "col": 15,
+      "floor": 0,
+      "dir": -1
+    },
+    {
+      "kind": "blue",
+      "col": 20,
+      "floor": 1,
+      "dir": -1
+    },
+    {
+      "kind": "blue",
+      "col": 2,
+      "floor": 0,
+      "dir": 1
+    },
+    {
+      "kind": "green",
+      "col": 15,
+      "floor": 1,
+      "dir": -1
+    },
+    {
+      "kind": "green",
+      "col": 6,
+      "floor": 0,
+      "dir": 1
+    }
+  ],
+  "timeLimitSec": 360,
+  "seed": 2039,
+  "theme": {
+    "skyTop": "#ffb07a",
+    "skyBottom": "#ffe0c0"
+  },
+  "hint": "從最下面的洞開始挖，再一層一層往上，就不會掉進自己的洞。"
+}

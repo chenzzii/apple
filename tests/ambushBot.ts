@@ -4,10 +4,11 @@ import { ENEMY_KINDS, NO_INPUT, type InputFrame } from '../src/core/types';
 
 /**
  * A simple scripted player used to prove levels are clearable.
- * Strategy ("stacked ambush"): dig a 2-deep shaft next to `col` — the lower hole first, from the
- * outside so the bot never has to cross it — then stand at `col` on `upper`, open the shaft top and
- * a plain hole on the other side, and pound whatever gets trapped next to it. Enemies trapped in the
- * shaft fall 2 floors (enough for green). Basic danger handling: wait clear of busy ladders,
+ * Strategy ("stacked ambush"): dig an aligned shaft next to `col` from floor `upper` down to floor
+ * `lower` — the lower holes first, deepest first, each from the outside so the bot never has to cross
+ * it — then stand at `col` on `upper`, open the shaft top and a plain hole on the other side, and
+ * pound whatever gets trapped next to it. A trapped enemy in the shaft falls (lower - upper + 1)
+ * floors: 2 is enough for green, 3 for blue. Basic danger handling: wait clear of busy ladders,
  * dig a hole toward an approaching enemy, step away if it is very close.
  * Navigation fills any open hole in its path instead of falling through it.
  */
@@ -18,8 +19,9 @@ export class AmbushBot {
   constructor(
     readonly col: number,
     readonly upper: number,
+    /** Deepest floor of the shaft (upper + 1 for a 2-floor drop, upper + 2 for 3). */
     readonly lower: number,
-    /** Which side of `col` the 2-deep shaft is on (-1 left, 1 right). */
+    /** Which side of `col` the shaft is on (-1 left, 1 right). */
     readonly side: -1 | 1 = -1,
   ) {}
 
@@ -75,12 +77,13 @@ export class AmbushBot {
     const shaft = this.col + this.side; // column of the 2-deep shaft
     const outerKey: 'L' | 'R' = this.side < 0 ? 'R' : 'L';
 
-    // 1) Lower half of the shaft, dug from OUTSIDE so we never have to cross our own hole.
-    if (!open(this.lower, shaft)) {
+    // 1) Lower part of the shaft (floors upper+1 … lower), deepest first, each dug from OUTSIDE
+    //    so we never have to cross our own hole.
+    for (let lf = this.lower; lf > this.upper; lf--) {
+      if (open(lf, shaft)) continue;
       const stand = MapGrid.colCenter(this.col + 2 * this.side);
-      if (!this.navigate(sim, this.lower, stand)) return this.lastNav;
-      if (map.holeState(this.lower, shaft) === 'REFILLING') return this.act(outerKey, 'refill-redo');
-      return this.act(outerKey, `dig-lower`);
+      if (!this.navigate(sim, lf, stand)) return this.lastNav;
+      return this.act(outerKey, `dig-lower${lf}`);
     }
     // 2) Upper floor: stand next to the shaft, open the shaft top and a plain hole on the other side.
     if (!this.navigate(sim, this.upper, cx)) return this.lastNav;
