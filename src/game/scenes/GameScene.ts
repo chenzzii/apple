@@ -372,8 +372,8 @@ export class GameScene extends Phaser.Scene {
     g.fillRoundedRect(OX - 8, OY - 8, WORLD_W + 16, WORLD_H - 40, 18);
     // side panels
     g.fillStyle(0x2a1b3d, 0.55);
-    g.fillRoundedRect(8, OY, OX - 24, 470, 14);
-    g.fillRoundedRect(OX + WORLD_W + 16, OY, OX - 24, 470, 14);
+    g.fillRoundedRect(8, OY, OX - 24, 506, 14);
+    g.fillRoundedRect(OX + WORLD_W + 16, OY, OX - 24, 506, 14);
     // top HUD bar
     g.fillStyle(0x2a1b3d, 0.75);
     g.fillRoundedRect(8, 8, GAME_W - 16, 60, 14);
@@ -700,7 +700,7 @@ export class GameScene extends Phaser.Scene {
         '　地板 → 挖洞　　已經有洞 → 補起來　　洞裡困著敵人 → 敲下去',
         '敵人走到洞上會掉進去被困住（約 5 秒後會爬出來）',
         '長按時，挖好／補好／敲落後會自動停住，放開再按才會繼續',
-        '紅蘋果掉 1 層、綠蝴蝶 2 層、藍面具 3 層才會消滅',
+        '紅蘋果掉 1 層、綠捕蠅草 2 層、藍仙人掌 3 層才會消滅',
         '要連續掉多層：下面樓層同一直行也要先挖好洞',
         '小心！自己走到挖好的洞上，也會掉到下一層',
         '',
