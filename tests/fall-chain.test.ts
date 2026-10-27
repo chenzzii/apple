@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { poundUntilResolved, trapScenario } from './helpers';
+import { input, poundUntilResolved, trapScenario } from './helpers';
 import type { EnemyKind } from '../src/core/types';
 
 const shaft = (n: number) => Array.from({ length: n }, (_, i) => ({ floor: i + 1, col: 10 }));
@@ -59,7 +59,7 @@ describe('misaligned / non-consecutive falls (T05)', () => {
     expect(e.floor).toBe(1);
     // Force the green to walk left toward col 6 hole.
     e.dir = -1;
-    for (let i = 0; i < 1000 && e.state !== 'TRAPPED'; i++) sim.step({ left: false, right: false, up: false, down: false, digHeld: false, digPressed: false, poundHeld: false, poundPressed: false });
+    for (let i = 0; i < 1000 && e.state !== 'TRAPPED'; i++) sim.step(input());
     expect(e.state).toBe('TRAPPED');
     expect(e.floor).toBe(1);
     // Knock it through from floor 1 -> floor 2: still a 1-floor fall, total history ignored.

@@ -1,7 +1,7 @@
 import type { InputFrame } from '../core/types';
 import type { Keymap } from './Settings';
 
-type Action = 'left' | 'right' | 'up' | 'down' | 'dig' | 'pound';
+type Action = 'left' | 'right' | 'up' | 'down' | 'digLeft' | 'digRight';
 
 const MAPS: Record<Keymap, Record<string, Action>> = {
   modern: {
@@ -9,16 +9,16 @@ const MAPS: Record<Keymap, Record<string, Action>> = {
     ArrowRight: 'right', KeyD: 'right',
     ArrowUp: 'up', KeyW: 'up',
     ArrowDown: 'down', KeyS: 'down',
-    KeyJ: 'dig',
-    KeyK: 'pound',
+    KeyJ: 'digLeft',
+    KeyK: 'digRight',
   },
   classic: {
     KeyJ: 'left',
     KeyK: 'right',
     KeyI: 'up',
     KeyM: 'down',
-    KeyA: 'dig',
-    KeyS: 'pound',
+    KeyA: 'digLeft',
+    KeyS: 'digRight',
   },
 };
 
@@ -82,10 +82,10 @@ export class InputController {
       right: h.has('right') || p.has('right'),
       up: h.has('up') || p.has('up'),
       down: h.has('down') || p.has('down'),
-      digHeld: h.has('dig'),
-      digPressed: p.has('dig'),
-      poundHeld: h.has('pound'),
-      poundPressed: p.has('pound'),
+      digLeftHeld: h.has('digLeft'),
+      digLeftPressed: p.has('digLeft'),
+      digRightHeld: h.has('digRight'),
+      digRightPressed: p.has('digRight'),
     };
     p.clear();
     return frame;

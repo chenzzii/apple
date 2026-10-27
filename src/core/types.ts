@@ -23,6 +23,7 @@ export type PlayerState =
   | 'CLIMBING'
   | 'DIGGING'
   | 'POUNDING'
+  | 'FALLING'
   | 'HURT'
   | 'DEAD'
   | 'RESPAWNING';
@@ -39,10 +40,12 @@ export interface InputFrame {
   right: boolean;
   up: boolean;
   down: boolean;
-  digHeld: boolean;
-  digPressed: boolean;
-  poundHeld: boolean;
-  poundPressed: boolean;
+  /** J (modern): dig the tile to the LEFT, or pound if an enemy is trapped there. */
+  digLeftHeld: boolean;
+  digLeftPressed: boolean;
+  /** K (modern): dig the tile to the RIGHT, or pound if an enemy is trapped there. */
+  digRightHeld: boolean;
+  digRightPressed: boolean;
 }
 
 export const NO_INPUT: Readonly<InputFrame> = Object.freeze({
@@ -50,10 +53,10 @@ export const NO_INPUT: Readonly<InputFrame> = Object.freeze({
   right: false,
   up: false,
   down: false,
-  digHeld: false,
-  digPressed: false,
-  poundHeld: false,
-  poundPressed: false,
+  digLeftHeld: false,
+  digLeftPressed: false,
+  digRightHeld: false,
+  digRightPressed: false,
 });
 
 export interface LadderDef {
@@ -93,8 +96,8 @@ export interface LevelData {
 export type GameEvent =
   | { type: 'hole-dig-progress'; floor: number; col: number; progress: number }
   | { type: 'hole-opened'; floor: number; col: number }
-  | { type: 'hole-fill-progress'; floor: number; col: number; progress: number }
-  | { type: 'hole-filled'; floor: number; col: number }
+  | { type: 'player-fall-started'; floor: number; col: number }
+  | { type: 'player-landed'; floor: number }
   | { type: 'enemy-trapped'; enemyId: number; floor: number; col: number }
   | { type: 'hole-pound-progress'; enemyId: number; floor: number; col: number; progress: number }
   | { type: 'enemy-fall-started'; enemyId: number; fromFloor: number; col: number }

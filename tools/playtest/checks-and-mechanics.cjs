@@ -134,11 +134,11 @@ const out = {};
       if (trapped) {
         if (!shotTrapped) { shotTrapped = true; await p.screenshot({ path: 'test-artifacts/13-blue-or-green-trapped.png' }); }
         const want = trapped.trapCol > 9 ? 1 : -1;
-        if (s.p.facing !== want) await tap(want === 1 ? 'ArrowRight' : 'ArrowLeft'); else await hold(['k']);
+        await hold([want === 1 ? 'k' : 'j']); // same key pounds when an enemy is trapped there
       } else if (holes.h10 !== 'OPEN' && holes.h10 !== 'OCCUPIED') {
-        if (s.p.facing !== 1) await tap('ArrowRight'); else await hold(['j']);
+        await hold(['k']); // K = dig right
       } else if (holes.h8 !== 'OPEN' && holes.h8 !== 'OCCUPIED') {
-        if (s.p.facing !== -1) await tap('ArrowLeft'); else await hold(['j']);
+        await hold(['j']); // J = dig left
       } else await hold([]);
     } else {
       // red on lower floors: ambush on floor 3 at col 9 like level 1 (holes at 3,8 / 3,10)
@@ -146,9 +146,9 @@ const out = {};
       const st = await p.evaluate(() => { const m = window.__orchard.sim.map; return { a: m.holeState(3, 10), b: m.holeState(3, 8) }; });
       if (trapped) {
         const want = trapped.trapCol > 9 ? 1 : -1;
-        if (s.p.facing !== want) await tap(want === 1 ? 'ArrowRight' : 'ArrowLeft'); else await hold(['k']);
-      } else if (st.a !== 'OPEN' && st.a !== 'OCCUPIED') { if (s.p.facing !== 1) await tap('ArrowRight'); else await hold(['j']); }
-      else if (st.b !== 'OPEN' && st.b !== 'OCCUPIED') { if (s.p.facing !== -1) await tap('ArrowLeft'); else await hold(['j']); }
+        await hold([want === 1 ? 'k' : 'j']); // same key pounds when an enemy is trapped there
+      } else if (st.a !== 'OPEN' && st.a !== 'OCCUPIED') { await hold(['k']); /* K = dig right */ }
+      else if (st.b !== 'OPEN' && st.b !== 'OCCUPIED') { await hold(['j']); /* J = dig left */ }
       else await hold([]);
     }
     await sleep(20);

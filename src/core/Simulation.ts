@@ -28,6 +28,8 @@ export interface Player {
   cooldownSteps: number;
   actionAnimSteps: number;
   lastAction: 'dig' | 'pound' | null;
+  /** Floor index the player is falling toward (only while FALLING). */
+  fallTarget: number;
 }
 
 export interface Enemy {
@@ -116,7 +118,7 @@ export class Simulation {
     this.statusTimer = this.s.ready;
     this.player = {
       x: 0, y: 0, prevX: 0, prevY: 0, floor: 0, ladder: null, facing: 1, state: 'IDLE',
-      invulnSteps: 0, cooldownSteps: 0, actionAnimSteps: 0, lastAction: null,
+      invulnSteps: 0, cooldownSteps: 0, actionAnimSteps: 0, lastAction: null, fallTarget: 0,
     };
     this.enemies = level.enemies.map((spawn, i) => ({
       id: i + 1, kind: spawn.kind, spawn, x: 0, y: 0, prevX: 0, prevY: 0, floor: 0, dir: 1 as Dir,
@@ -143,14 +145,14 @@ export class Simulation {
     return ev;
   }
 
-  /** The tile the player would dig/pound right now, or null if out of bounds. */
-  get targetCol(): number {
-    return MapGrid.colOf(this.player.x) + this.player.facing;
+  /** Column of the player's tile; J acts on col-1, K on col+1. */
+  get playerCol(): number {
+    return MapGrid.colOf(this.player.x);
   }
 
-  /** Whether the player can currently act on the floor (not mid-ladder). */
+  /** Whether the player can currently act on the floor (not mid-ladder, not falling). */
   get playerOnFloor(): boolean {
-    return this.player.ladder === null;
+    return this.player.ladder === null && this.player.state !== 'FALLING';
   }
 
   /** Debug/mechanics level helper: re-open preset aligned holes (one key). */
@@ -233,6 +235,7 @@ export class Simulation {
     p.cooldownSteps = 0;
     p.actionAnimSteps = 0;
     p.lastAction = null;
+    p.fallTarget = 0;
     for (const e of this.enemies) {
       if (!initial && e.state === 'DEFEATED') continue;
       e.floor = e.spawn.floor;
@@ -258,18 +261,18 @@ export class Simulation {
     if (p.actionAnimSteps > 0) p.actionAnimSteps--;
     let moved = false;
 
+    if (p.state === 'FALLING') {
+      this.playerFall();
+      return; // no control while falling (there is no jump either)
+    }
+
     if (p.ladder) {
       const l = p.ladder;
       const v = cfg.playerClimbSpeed * STEP_SEC;
       const top = this.level.floorY[l.top]!;
       const bot = this.level.floorY[l.bottom]!;
-      if (input.up && !input.down) {
-        p.y -= v;
-        moved = true;
-      } else if (input.down && !input.up) {
-        p.y += v;
-        moved = true;
-      }
+      if (input.up && !input.down) p.y -= v;
+      else if (input.down && !input.up) p.y += v;
       if (p.y <= top) {
         p.y = top;
         p.floor = l.top;
@@ -279,8 +282,7 @@ export class Simulation {
         p.floor = l.bottom;
         p.ladder = null;
       }
-      p.state = 'CLIMBING';
-      if (!p.ladder) p.state = moved ? 'IDLE' : 'IDLE';
+      p.state = p.ladder ? 'CLIMBING' : 'IDLE';
       if (p.ladder) return;
     } else {
       const col = MapGrid.colOf(p.x);
@@ -302,43 +304,64 @@ export class Simulation {
         moved = true;
       }
       p.state = moved ? 'WALKING' : 'IDLE';
+      // Walking onto an open hole drops the player to the floor below.
+      if (this.startPlayerFallIfOverHole()) return;
     }
 
-    // Dig / pound pulses (only while standing on a floor; there is no jump).
+    // J = act on the LEFT tile, K = act on the RIGHT tile. Each pulse digs, or pounds
+    // if that tile holds a trapped enemy. Only while standing on a floor.
     if (p.cooldownSteps === 0) {
-      if (input.digPressed || input.digHeld) {
-        this.digPulse(input.digPressed);
-        p.cooldownSteps = this.s.pulseCooldown;
-      } else if (input.poundPressed || input.poundHeld) {
-        this.poundPulse(input.poundPressed);
+      const left = input.digLeftPressed || input.digLeftHeld;
+      const right = input.digRightPressed || input.digRightHeld;
+      if (left || right) {
+        const dir: Dir = left ? -1 : 1;
+        const explicit = left ? input.digLeftPressed : input.digRightPressed;
+        p.facing = dir;
+        this.actPulse(dir, explicit);
         p.cooldownSteps = this.s.pulseCooldown;
       }
     }
     if (p.actionAnimSteps > 0) p.state = p.lastAction === 'dig' ? 'DIGGING' : 'POUNDING';
   }
 
-  private digPulse(explicit: boolean): void {
+  private startPlayerFallIfOverHole(): boolean {
     const p = this.player;
-    const col = this.targetCol;
-    const f = p.floor;
-    const t = this.map.canDig(f, col) ? this.map.ensureTile(f, col) : undefined;
-    if (!t || t.trappedEnemyId !== null || t.progress >= this.cfg.digPulses) {
-      if (explicit) this.emit({ type: 'invalid-action', action: 'dig' });
-      return;
-    }
-    t.progress++;
-    t.lastAction = 'dig';
-    p.lastAction = 'dig';
-    p.actionAnimSteps = 8;
-    this.emit({ type: 'hole-dig-progress', floor: f, col, progress: t.progress });
-    if (t.progress >= this.cfg.digPulses) this.emit({ type: 'hole-opened', floor: f, col });
+    const col = MapGrid.colOf(p.x);
+    if (!this.map.isOpen(p.floor, col)) return false;
+    if (Math.abs(p.x - MapGrid.colCenter(col)) > this.cfg.holeCatch) return false;
+    p.x = MapGrid.colCenter(col);
+    p.state = 'FALLING';
+    p.fallTarget = p.floor + 1;
+    p.actionAnimSteps = 0;
+    this.emit({ type: 'player-fall-started', floor: p.floor, col });
+    return true;
   }
 
-  private poundPulse(explicit: boolean): void {
+  private playerFall(): void {
     const p = this.player;
-    const col = this.targetCol;
+    const col = MapGrid.colOf(p.x);
+    p.y += this.cfg.fallSpeed * STEP_SEC;
+    // Like enemies, keep falling through ALIGNED open holes below.
+    while (p.y >= this.level.floorY[p.fallTarget]!) {
+      const f = p.fallTarget;
+      if (f < this.map.bottomFloor && this.map.isOpen(f, col)) {
+        p.fallTarget = f + 1;
+        continue;
+      }
+      p.y = this.level.floorY[f]!;
+      p.floor = f;
+      p.state = 'IDLE';
+      this.emit({ type: 'player-landed', floor: f });
+      return;
+    }
+  }
+
+  /** One dig/pound pulse on the tile at the player's column + dir. */
+  private actPulse(dir: Dir, explicit: boolean): void {
+    const p = this.player;
+    const col = MapGrid.colOf(p.x) + dir;
     const f = p.floor;
-    const t = this.map.canDig(f, col) ? this.map.tile(f, col) : undefined;
+    const t = this.map.canDig(f, col) ? this.map.ensureTile(f, col) : undefined;
     if (t && t.trappedEnemyId !== null) {
       const enemy = this.enemies.find((e) => e.id === t.trappedEnemyId);
       if (!enemy || enemy.state !== 'TRAPPED') {
@@ -352,19 +375,16 @@ export class Simulation {
       if (t.poundProgress >= this.cfg.poundPulses) this.knockThrough(enemy, t);
       return;
     }
-    if (t && t.progress > 0) {
-      t.progress--;
-      t.lastAction = 'fill';
-      p.lastAction = 'pound';
-      p.actionAnimSteps = 8;
-      this.emit({ type: 'hole-fill-progress', floor: f, col, progress: t.progress });
-      if (t.progress === 0) {
-        this.map.fill(f, col);
-        this.emit({ type: 'hole-filled', floor: f, col });
-      }
+    if (!t || t.progress >= this.cfg.digPulses) {
+      if (explicit) this.emit({ type: 'invalid-action', action: 'dig' });
       return;
     }
-    if (explicit) this.emit({ type: 'invalid-action', action: 'pound' });
+    t.progress++;
+    t.lastAction = 'dig';
+    p.lastAction = 'dig';
+    p.actionAnimSteps = 8;
+    this.emit({ type: 'hole-dig-progress', floor: f, col, progress: t.progress });
+    if (t.progress >= this.cfg.digPulses) this.emit({ type: 'hole-opened', floor: f, col });
   }
 
   private knockThrough(e: Enemy, t: Tile): void {

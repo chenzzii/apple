@@ -68,7 +68,7 @@ export class MenuScene extends Phaser.Scene {
     const g = this.art;
     g.clear();
     const px = 200 + ((this.t * 90) % 900);
-    drawGardener(g, px, 600, { facing: 1, walkPhase: px * 0.25, climbing: false, action: 'none', actionT: 0, blink: false, hurt: false });
+    drawGardener(g, px, 600, { facing: 1, walkPhase: px * 0.25, climbing: false, falling: false, action: 'none', actionT: 0, blink: false, hurt: false });
     drawEnemy(g, 'red', px - 120, 600, { t: this.t, dir: 1, trapped: false, falling: false, stunned: false, climbing: false });
     drawEnemy(g, 'green', 1060, 560, { t: this.t, dir: -1, trapped: false, falling: false, stunned: false, climbing: false });
     drawEnemy(g, 'blue', 1150, 600, { t: this.t, dir: -1, trapped: false, falling: false, stunned: false, climbing: false });
@@ -125,7 +125,7 @@ export class MenuScene extends Phaser.Scene {
     const km = KEYMAP_HELP[settings.keymap];
     this.info.setText(
       [
-        `鍵位：${settings.keymap === 'modern' ? '現代（方向鍵/WASD + J 挖 K 敲）' : '原典（I J K M 移動 + A 挖 S 敲）'}　［C 切換］`,
+        `鍵位：${settings.keymap === 'modern' ? '現代（方向鍵/WASD + J 向左挖 K 向右挖）' : '原典（I J K M 移動 + A 向左挖 S 向右挖）'}　［C 切換］`,
         `世界速度：${settings.speed.toFixed(2)}x　［1 = 1.0　2 = 1.25　3 = 1.5　4 = 2.0］`,
       ].join('\n'),
     );
@@ -134,8 +134,9 @@ export class MenuScene extends Phaser.Scene {
         '操作說明',
         '',
         `移動：${km.move}　　爬梯：${km.climb}（沒有跳躍）`,
-        `挖洞：${km.dig}（面向的地板，連按/長按 6 次）`,
-        `敲擊 / 填洞：${km.pound}（對困在洞裡的敵人敲 6 次）`,
+        `向左挖：${km.digLeft}　　向右挖：${km.digRight}（連按/長按 6 次挖開）`,
+        '那一格洞裡困著敵人時，同一個鍵改成敲擊（6 下敲落）',
+        '注意：走到挖好的洞上，自己也會掉到下一層！',
         '',
         '紅蘋果：連續掉 1 層消滅（每層 100 分）',
         '綠蝴蝶：連續掉 2 層消滅（每層 200 分）',

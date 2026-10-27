@@ -51,6 +51,7 @@ export interface GardenerPose {
   facing: -1 | 1;
   walkPhase: number; // radians, advances while walking
   climbing: boolean;
+  falling: boolean;
   action: 'none' | 'dig' | 'pound';
   actionT: number; // 0..1 animation progress
   blink: boolean; // invulnerability flicker
@@ -61,7 +62,19 @@ export interface GardenerPose {
 export function drawGardener(g: G, x: number, y: number, pose: GardenerPose): void {
   if (pose.blink) return;
   const f = pose.facing;
-  const swing = Math.sin(pose.walkPhase);
+  const swing = pose.falling ? 0 : Math.sin(pose.walkPhase);
+  if (pose.falling) {
+    // arms up + speed lines while dropping through a hole
+    g.lineStyle(3, PALETTE.white, 0.6);
+    g.lineBetween(x - 12, y - 64, x - 12, y - 86);
+    g.lineBetween(x + 12, y - 60, x + 12, y - 80);
+    g.fillStyle(PALETTE.skin, 1);
+    g.lineStyle(3, PALETTE.ink, 1);
+    g.fillCircle(x - 15, y - 54, 4.5);
+    g.strokeCircle(x - 15, y - 54, 4.5);
+    g.fillCircle(x + 15, y - 54, 4.5);
+    g.strokeCircle(x + 15, y - 54, 4.5);
+  }
   g.lineStyle(3, PALETTE.ink, 1);
 
   if (pose.climbing) {

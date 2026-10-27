@@ -15,12 +15,12 @@ Open the URL Vite prints. **Enter** starts level 1, **T** opens the mechanics te
 |---|---|---|
 | Move | ← → / A D | J K |
 | Climb | ↑ ↓ / W S | I M |
-| Dig (6 pulses) | J | A |
-| Pound trapped enemy / fill hole (6 pulses) | K | S |
+| Dig LEFT tile (6 pulses) — pounds instead if an enemy is trapped there | J | A |
+| Dig RIGHT tile (6 pulses) — pounds instead if an enemy is trapped there | K | S |
 
 Esc/P pause · 1–4 world speed (1.0/1.25/1.5/2.0x) · R restart · N mute · C (menu) switch keymap.
 
-Enemies: red apple needs a 1-floor fall, green butterfly 2, blue mask 3 — in one continuous fall through holes in the **same column**.
+Walking onto an open hole drops **you** to the floor below too. Enemies: red apple needs a 1-floor fall, green butterfly 2, blue mask 3 — in one continuous fall through holes in the **same column**.
 
 ## Develop
 ```bash

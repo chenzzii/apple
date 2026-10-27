@@ -31,7 +31,7 @@ export class Sfx {
 
   dig(progress: number) { this.tone(180 + progress * 30, 0.06, 'square', 0.06); }
   holeOpen() { this.tone(300, 0.08, 'triangle', 0.1); this.tone(450, 0.1, 'triangle', 0.1, undefined, 0.07); }
-  fill() { this.tone(240, 0.05, 'sawtooth', 0.04); }
+  playerFall() { this.tone(520, 0.3, 'triangle', 0.08, 180); }
   trapped() { this.tone(600, 0.25, 'sine', 0.1, 200); }
   pound(progress: number) { this.tone(120 + progress * 20, 0.07, 'square', 0.09); }
   fall() { this.tone(700, 0.45, 'triangle', 0.08, 120); }

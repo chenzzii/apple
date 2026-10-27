@@ -65,10 +65,10 @@ export function trapScenario(kind: EnemySpawn['kind'], belowHoles: { floor: numb
   return sim;
 }
 
-/** Hold the pound key until the trapped enemy is released and has finished falling. */
+/** Hold K (act right: pound) until the trapped enemy is released and has finished falling. */
 export function poundUntilResolved(sim: Simulation) {
   const e = sim.enemies[0]!;
-  runUntil(sim, (s) => s.enemies[0]!.state !== 'TRAPPED', input({ poundHeld: true }), 400);
+  runUntil(sim, (s) => s.enemies[0]!.state !== 'TRAPPED', input({ digRightHeld: true }), 400);
   runUntil(sim, () => e.state !== 'FALLING', input(), 400);
   return e;
 }
