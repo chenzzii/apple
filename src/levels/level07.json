@@ -1,0 +1,108 @@
+{
+  "id": "level07",
+  "name": "第 7 關：捕蠅草苗圃",
+  "cols": 24,
+  "floorY": [
+    112,
+    204,
+    296,
+    388,
+    480
+  ],
+  "diggableFloors": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "ladders": [
+    {
+      "col": 3,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 9,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 21,
+      "top": 0,
+      "bottom": 1
+    },
+    {
+      "col": 11,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 16,
+      "top": 1,
+      "bottom": 2
+    },
+    {
+      "col": 8,
+      "top": 2,
+      "bottom": 3
+    },
+    {
+      "col": 20,
+      "top": 2,
+      "bottom": 3
+    },
+    {
+      "col": 2,
+      "top": 3,
+      "bottom": 4
+    },
+    {
+      "col": 10,
+      "top": 3,
+      "bottom": 4
+    }
+  ],
+  "player": {
+    "col": 11,
+    "floor": 4
+  },
+  "enemies": [
+    {
+      "kind": "green",
+      "col": 1,
+      "floor": 0,
+      "dir": 1
+    },
+    {
+      "kind": "green",
+      "col": 19,
+      "floor": 1,
+      "dir": -1
+    },
+    {
+      "kind": "red",
+      "col": 13,
+      "floor": 2,
+      "dir": -1
+    },
+    {
+      "kind": "red",
+      "col": 16,
+      "floor": 0,
+      "dir": -1
+    },
+    {
+      "kind": "red",
+      "col": 7,
+      "floor": 1,
+      "dir": 1
+    }
+  ],
+  "timeLimitSec": 270,
+  "seed": 2033,
+  "theme": {
+    "skyTop": "#a6e8c4",
+    "skyBottom": "#f6f9d8"
+  },
+  "hint": "對齊的兩層洞也能一次打倒紅蘋果，好好利用。"
+}
