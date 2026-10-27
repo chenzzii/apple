@@ -8,7 +8,14 @@ npm install
 npm run dev        # open the printed http://localhost:5173 URL
 ```
 Menu: **Enter** start level 1 · **T** mechanics test level · **H** help · **C** switch keymap · **1–4** world speed (1.0 / 1.25 / 1.5 / 2.0x).
-In game: arrows/WASD move & climb, **J** dig, **K** pound/fill (classic keymap: I/J/K/M + A/S) · **Esc/P** pause · **H** help · **R** restart · **N** mute · **G** re-open test holes (test level only).
+In game: arrows/WASD move & climb, **J** dig/pound LEFT tile, **K** dig/pound RIGHT tile (classic keymap: I/J/K/M + A/S) · **Esc/P** pause · **H** help · **R** restart · **N** mute · **G** re-open test holes (test level only).
+
+## 2026-10-27 — controls + hole-fall change (owner request)
+- J = dig the LEFT tile, K = dig the RIGHT tile; the same key pounds if an enemy is trapped in that tile. Fill-hole action removed.
+- Walking onto an open hole now drops the player to the next floor (through aligned holes too). See DECISIONS D1/D11.
+- On-screen J/K labels under the two target tiles (gold "敲" when it will pound); help, menu and side panel updated.
+- `npm run typecheck` ✅ · `npm run test` ✅ **33 tests** (new: J/K sides, own-hole fall, aligned multi-floor player fall, walking over an occupied hole) · `npm run build` ✅
+- Browser (headless Chromium, real keys): level 1 cleared with J/K; `tools/playtest/player-falls.cjs` dug with K ×6, walked right, fell floor 0 → 3 through the aligned shaft; full checks script: pause/speed/tab-hide/loss/retry pass, mechanics level cleared (blue 3 floors, green 2, red 1); 0 console errors.
 
 ## Latest verified work
 - Pure TypeScript deterministic simulation in `src/core/` (fixed 60 Hz, seeded RNG, typed events), no Phaser imports.

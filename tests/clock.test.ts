@@ -13,8 +13,8 @@ function script(step: number): InputFrame {
     right: phase === 1 || phase === 4,
     up: phase === 2,
     down: phase === 5,
-    digHeld: step % 200 < 50,
-    poundHeld: step % 300 > 250,
+    digLeftHeld: step % 200 < 50,
+    digRightHeld: step % 300 > 250,
   });
 }
 

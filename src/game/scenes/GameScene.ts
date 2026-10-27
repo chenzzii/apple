@@ -235,11 +235,11 @@ export class GameScene extends Phaser.Scene {
         sfx.holeOpen();
         this.burst(cx(ev.col), fy(ev.floor) + 6, PALETTE.brick, 14, 160);
         break;
-      case 'hole-fill-progress':
-        sfx.fill();
+      case 'player-fall-started':
+        sfx.playerFall();
         break;
-      case 'hole-filled':
-        this.burst(cx(ev.col), fy(ev.floor), PALETTE.grassTop, 8, 80);
+      case 'player-landed':
+        this.burst(OX + this.sim.player.x, fy(ev.floor), PALETTE.grassTop, 8, 80);
         break;
       case 'enemy-trapped':
         sfx.trapped();
@@ -422,17 +422,36 @@ export class GameScene extends Phaser.Scene {
       }
     }
 
-    // Player target highlight
+    // Player action targets: J = left tile, K = right tile (gold = will pound a trapped enemy).
     const p = sim.player;
-    if (sim.status === 'PLAYING' && sim.playerOnFloor) {
-      const col = sim.targetCol;
-      if (col >= 0 && col < lv.cols) {
-        const tile = sim.map.tile(p.floor, col);
-        const trapped = tile?.trappedEnemyId != null;
-        const ok = sim.map.canDig(p.floor, col);
-        g.lineStyle(3, ok ? (trapped ? PALETTE.gold : PALETTE.white) : PALETTE.bad, ok ? 0.9 : 0.5);
-        g.strokeRoundedRect(OX + col * TILE + 1, OY + lv.floorY[p.floor]! - 2, TILE - 2, FLOOR_THICK + 4, 4);
+    const km = KEYMAP_HELP[settings.keymap];
+    const showTargets = sim.status === 'PLAYING' && sim.playerOnFloor;
+    for (const [dir, key, label] of [[-1, 'keyL', km.digLeft], [1, 'keyR', km.digRight]] as const) {
+      const col = sim.playerCol + dir;
+      let txt = this.texts[key];
+      if (!txt) {
+        txt = this.add
+          .text(0, 0, '', { fontFamily: FONT, fontSize: '13px', color: '#ffffff', fontStyle: 'bold', stroke: '#2a1b3d', strokeThickness: 4 })
+          .setOrigin(0.5, 0)
+          .setDepth(15);
+        this.texts[key] = txt;
       }
+      if (!showTargets || col < 0 || col >= lv.cols) {
+        txt.setVisible(false);
+        continue;
+      }
+      const tile = sim.map.tile(p.floor, col);
+      const trapped = tile?.trappedEnemyId != null;
+      const ok = sim.map.canDig(p.floor, col);
+      const tx = OX + col * TILE;
+      const ty = OY + lv.floorY[p.floor]!;
+      g.lineStyle(3, ok ? (trapped ? PALETTE.gold : PALETTE.white) : PALETTE.bad, ok ? 0.85 : 0.45);
+      g.strokeRoundedRect(tx + 1, ty - 2, TILE - 2, FLOOR_THICK + 4, 4);
+      txt
+        .setText(ok ? `${label}${trapped ? ' 敲' : ''}` : '✕')
+        .setColor(trapped ? '#ffe066' : ok ? '#ffffff' : '#ff8a8a')
+        .setPosition(tx + TILE / 2, ty + FLOOR_THICK + 3)
+        .setVisible(true);
     }
 
     // Enemies: trapped ones first (behind floor lip), then others
@@ -469,6 +488,7 @@ export class GameScene extends Phaser.Scene {
       facing: p.facing,
       walkPhase: p.ladder ? p.y * 0.3 : p.x * 0.25,
       climbing: !!p.ladder,
+      falling: p.state === 'FALLING',
       action,
       actionT: 1 - p.actionAnimSteps / 8,
       blink: sim.status === 'PLAYING' && p.invulnSteps > 0 && Math.floor(this.t * 12) % 2 === 0,
@@ -590,8 +610,9 @@ export class GameScene extends Phaser.Scene {
         '',
         `移動  ${km.move}`,
         `爬梯  ${km.climb}`,
-        `挖洞  ${km.dig}`,
-        `敲擊/填洞  ${km.pound}`,
+        `向左挖  ${km.digLeft}`,
+        `向右挖  ${km.digRight}`,
+        '（有敵人=敲下去）',
         '（沒有跳躍）',
         '',
         '暫停  Esc / P',
@@ -645,12 +666,12 @@ export class GameScene extends Phaser.Scene {
       title = '怎麼玩';
       body = [
         `${km.move} 左右走，在梯子前按 ${km.climb} 爬梯（沒有跳躍）`,
-        `面向一格地板，按 ${km.dig} 六次挖出一個洞`,
+        `按 ${km.digLeft} 挖左邊一格、按 ${km.digRight} 挖右邊一格，各要 6 下`,
         '敵人走到洞上會掉進去被困住（約 5 秒後會爬出來）',
-        `站在旁邊按 ${km.pound} 六次，把牠敲下去`,
+        `洞裡有敵人時，同一個鍵改成敲擊：再按 6 下把牠敲下去`,
         '紅蘋果掉 1 層、綠蝴蝶 2 層、藍面具 3 層才會消滅',
         '要連續掉多層：下面樓層同一直行也要先挖好洞',
-        `${km.pound} 對空洞使用 = 把洞填回去`,
+        '小心！自己走到挖好的洞上，也會掉到下一層',
         '',
         'Esc / Enter 回到遊戲',
       ].join('\n');

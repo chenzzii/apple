@@ -5,11 +5,10 @@ Legend: **VERIFIED** = stated in the original Apple II manual / GDD §1 sources.
 ## Verified rules kept as-is
 | Rule | Where |
 |---|---|
-| No jump; move left/right, climb ladders, dig, pound/fill | `Simulation.updatePlayer` |
+| No jump; move left/right, climb ladders, dig, pound | `Simulation.updatePlayer` |
 | Red 1 floor / green 2 / blue 3, achieved in ONE continuous fall | `ENEMY_KINDS`, `Simulation.enemyLand` |
 | Base score 100 / 200 / 300 per floor fallen | `ENEMY_KINDS` |
 | 3 lives | `DEFAULT_CONFIG.startLives` |
-| Player can pass over holes safely | see D1 |
 | ~6 dig pulses per hole, ~6 pound pulses (player-guide figure, treated as reference) | `digPulses`, `poundPulses` |
 
 ## Provisional values (GDD §4 starting points)
@@ -25,7 +24,7 @@ Legend: **VERIFIED** = stated in the original Apple II manual / GDD §1 sources.
 | Enemy ladder choice: 60% take a ladder toward the player's floor, 25% any other ladder (seeded RNG) | config |
 
 ## Design decisions (ambiguities resolved)
-- **D1 Player over holes.** The manual says the player can safely cross holes, so the player walks over open holes and never falls through them. The GDD FSM's player `FALLING` state is therefore unused in Stage 1.
+- **D1 Player falls into open holes (owner decision 2026-10-27).** Walking onto an open hole (logical centre within 10 px of the hole centre) drops the player to the next floor, continuing through any ALIGNED open holes below, like enemies. No damage and no control while falling. Reason: walking over holes made the game too easy. This departs from the manual's "player can safely cross holes". A hole holding a trapped enemy is not open, so the player can walk over it.
 - **D2 Bottom floor.** The bottom floor is never diggable (enforced by level validation), so every fall has a landing floor.
 - **D3 Pounded hole seals.** When an enemy is knocked through, the hole it was in is refilled. Only *other* open holes in the same column below can extend the fall.
 - **D4 Occupied hole is solid.** A falling enemy lands on a lower hole that already holds a trapped enemy; it does not pass through.
@@ -35,7 +34,7 @@ Legend: **VERIFIED** = stated in the original Apple II manual / GDD §1 sources.
 - **D8 Trapped enemies are harmless**, as are enemies that are falling, stunned or climbing out.
 - **D9 Hole catch.** An enemy falls in only when its logical centre is within 10 px of the hole tile centre (grid logic, never sprite overlap).
 - **D10 Ladder cells.** The floor tile at both ends of a ladder is a ladder cell and can never be dug.
-- **D11 Keymaps.** Modern: arrows/WASD + J dig + K pound. Classic (original-style): I/J/K/M move + A dig + S pound. Only one keymap is active at a time (toggle with C on the menu).
+- **D11 Directional dig keys (owner decision 2026-10-27).** J acts on the tile to the LEFT, K on the tile to the RIGHT (classic keymap: A left, S right; I/J/K/M move). Each pulse digs that tile, or pounds if an enemy is trapped in it. Pressing J/K also turns the player to face that side. There is no separate fill-hole action any more (the original's facing-direction dig + S fill scheme is not used). Only one keymap is active at a time (toggle with C on the menu).
 - **D12 Frame timing.** The scene measures its own real frame delta with `performance.now()` (Phaser's delta is smoothed), clamps it to 100 ms, multiplies by world speed, and runs at most `ceil(5 × speed)` logic steps per frame; extra time is dropped, not replayed.
 - **D13 Mechanics test level** starts the player on the top floor with the green and blue enemies, and pre-opens aligned shafts (col 8: one hole below → green 2 floors; col 10: two holes below → blue 3 floors) plus an offset hole (col 9 on floor 2). Key **G** re-opens the preset holes (never under an enemy).
 

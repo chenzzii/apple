@@ -68,12 +68,11 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       else if (x > 392) await hold(['ArrowLeft']);
       else if (trapped) {
         const want = trapped.trapCol === 10 ? 1 : -1;
-        if (s.p.facing !== want) await tap(want === 1 ? 'ArrowRight' : 'ArrowLeft');
-        else await hold(['k']);
+        await hold([want === 1 ? 'k' : 'j']); // same key pounds when an enemy is trapped there
       } else if (s.h10 !== 'OPEN' && s.h10 !== 'OCCUPIED') {
-        if (s.p.facing !== 1) await tap('ArrowRight'); else await hold(['j']);
+        await hold(['k']); // K = dig right
       } else if (s.h8 !== 'OPEN' && s.h8 !== 'OCCUPIED') {
-        if (s.p.facing !== -1) await tap('ArrowLeft'); else await hold(['j']);
+        await hold(['j']); // J = dig left
       } else await hold([]);
     } else {
       // On another floor (should not happen in this plan): head down via any ladder by waiting.

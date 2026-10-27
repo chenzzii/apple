@@ -36,7 +36,7 @@ export function saveSettings(): void {
   }
 }
 
-export const KEYMAP_HELP: Record<Keymap, { move: string; climb: string; dig: string; pound: string }> = {
-  modern: { move: '← → / A D', climb: '↑ ↓ / W S', dig: 'J', pound: 'K' },
-  classic: { move: 'J  K', climb: 'I  M', dig: 'A', pound: 'S' },
+export const KEYMAP_HELP: Record<Keymap, { move: string; climb: string; digLeft: string; digRight: string }> = {
+  modern: { move: '← → / A D', climb: '↑ ↓ / W S', digLeft: 'J', digRight: 'K' },
+  classic: { move: 'J  K', climb: 'I  M', digLeft: 'A', digRight: 'S' },
 };
