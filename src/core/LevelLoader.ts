@@ -68,6 +68,12 @@ export function validateLevel(raw: unknown): LevelData {
   }
   if (!(lv.timeLimitSec > 0)) errors.push('timeLimitSec must be > 0');
   if (!Number.isInteger(lv.seed)) errors.push('seed must be an integer');
+  for (const [k, v] of Object.entries(lv.tuning ?? {})) {
+    if (typeof v !== 'number' || !(v >= 0)) errors.push(`tuning.${k} must be a non-negative number`);
+  }
+  for (const [k, v] of Object.entries(lv.theme ?? {})) {
+    if (typeof v !== 'string' || !/^#[0-9a-fA-F]{6}$/.test(v)) errors.push(`theme.${k} must be #rrggbb`);
+  }
 
   if (errors.length) throw new LevelValidationError(`Level "${lv.id}": ${errors.join('; ')}`);
   return lv;

@@ -1,4 +1,5 @@
 /** Shared simulation types. No Phaser imports allowed in src/core. */
+import type { GameplayConfig } from './config';
 
 export type Dir = -1 | 1;
 
@@ -91,6 +92,12 @@ export interface LevelData {
   presetHoles?: { floor: number; col: number }[];
   /** Mechanics/debug level flag: allows re-opening preset holes with a key. */
   debug?: boolean;
+  /** Per-level gameplay overrides (e.g. faster enemies in later levels). */
+  tuning?: Partial<GameplayConfig>;
+  /** Optional visual theme: sky gradient colours as hex strings like "#7fd3ff". */
+  theme?: { skyTop?: string; skyBottom?: string };
+  /** One-line tip shown on the READY screen. */
+  hint?: string;
 }
 
 export type GameEvent =

@@ -1,5 +1,6 @@
 import * as Phaser from 'phaser';
 import { SPEED_OPTIONS } from '../../core/config';
+import { CAMPAIGN, LEVELS } from '../../levels';
 import { PALETTE, drawEnemy, drawGardener } from '../../rendering/VectorArt';
 import { FONT, GAME_H, GAME_W } from '../constants';
 import { KEYMAP_HELP, saveSettings, settings } from '../Settings';
@@ -12,6 +13,8 @@ export class MenuScene extends Phaser.Scene {
   private showHelp = false;
   private art!: Phaser.GameObjects.Graphics;
   private t = 0;
+  /** Index into CAMPAIGN for "start game" (L cycles). */
+  private startIdx = 0;
 
   constructor() {
     super('MenuScene');
@@ -48,11 +51,11 @@ export class MenuScene extends Phaser.Scene {
       });
       return t;
     };
-    btn(280, 'Enter  開始遊戲', () => this.start('level01'));
+    btn(280, 'Enter  開始遊戲', () => this.start(CAMPAIGN[this.startIdx]!));
     btn(345, 'T  機制測試關', () => this.start('mechanics-test'));
     btn(410, 'H  操作說明', () => this.toggleHelp());
 
-    this.info = this.add.text(GAME_W / 2, 480, '', { fontFamily: FONT, fontSize: '20px', color: '#2a1b3d', align: 'center', lineSpacing: 6 }).setOrigin(0.5);
+    this.info = this.add.text(GAME_W / 2, 500, '', { fontFamily: FONT, fontSize: '20px', color: '#2a1b3d', align: 'center', lineSpacing: 6 }).setOrigin(0.5);
     this.help = this.add
       .text(GAME_W / 2, GAME_H / 2, '', { fontFamily: FONT, fontSize: '20px', color: '#ffffff', backgroundColor: '#2a1b3dee', padding: { x: 30, y: 24 }, align: 'left', lineSpacing: 8 })
       .setOrigin(0.5)
@@ -87,7 +90,7 @@ export class MenuScene extends Phaser.Scene {
       case 'Enter':
       case 'NumpadEnter':
       case 'Space':
-        this.start('level01');
+        this.start(CAMPAIGN[this.startIdx]!);
         break;
       case 'KeyT':
         this.start('mechanics-test');
@@ -95,6 +98,11 @@ export class MenuScene extends Phaser.Scene {
       case 'KeyH':
       case 'F1':
         this.toggleHelp();
+        break;
+      case 'KeyL':
+        this.startIdx = (this.startIdx + 1) % CAMPAIGN.length;
+        sfx.blip();
+        this.refresh();
         break;
       case 'KeyB':
         settings.music = !settings.music;
@@ -135,6 +143,7 @@ export class MenuScene extends Phaser.Scene {
       [
         `鍵位：${settings.keymap === 'modern' ? '現代（方向鍵/WASD + J 左 / K 右：挖・補・敲）' : '原典（I J K M 移動 + A 左 / S 右：挖・補・敲）'}　［C 切換］`,
         `世界速度：${settings.speed.toFixed(2)}x　［1 = 1.0　2 = 1.25　3 = 1.5　4 = 2.0］`,
+        `起始關卡：${LEVELS[CAMPAIGN[this.startIdx]!]!.name}　［L 切換］`,
         `背景音樂：${settings.music ? '開' : '關'}　［B 切換］　（按任一鍵後開始播放）`,
       ].join('\n'),
     );

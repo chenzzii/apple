@@ -9,7 +9,7 @@ An original HD 2D cartoon *spiritual remake* of the 1981 Apple Panic gameplay: w
 npm install
 npm run dev
 ```
-Open the URL Vite prints. **Enter** starts level 1, **T** opens the mechanics test level, **H** shows help.
+Open the URL Vite prints. **Enter** starts the game (**L** picks the start level: 1 果園入口, 2 捕蠅草溫室), **T** opens the mechanics test level, **H** shows help.
 
 | Action | Modern keys | Classic keys |
 |---|---|---|
