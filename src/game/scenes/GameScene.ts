@@ -4,7 +4,7 @@ import { FixedStepClock } from '../../core/FixedStepClock';
 import { MapGrid } from '../../core/MapGrid';
 import { Simulation, type Enemy } from '../../core/Simulation';
 import { ENEMY_KINDS, type GameEvent } from '../../core/types';
-import { CAMPAIGN, LEVELS } from '../../levels';
+import { LEVELS, nextCampaignLevel } from '../../levels';
 import { ENEMY_COLORS, PALETTE, drawDizzy, drawEnemy, drawGardener, drawHeart } from '../../rendering/VectorArt';
 import { FONT, GAME_H, GAME_W } from '../constants';
 import { InputController } from '../InputController';
@@ -228,12 +228,12 @@ export class GameScene extends Phaser.Scene {
   }
 
   private nextLevel(): void {
-    const idx = (CAMPAIGN as readonly string[]).indexOf(this.levelId);
-    const next = idx >= 0 && idx < CAMPAIGN.length - 1 ? CAMPAIGN[idx + 1]! : 'mechanics-test';
-    if (this.levelId === 'mechanics-test') {
+    const next = nextCampaignLevel(this.levelId);
+    if (!next) {
       this.scene.start('MenuScene');
       return;
     }
+    // Score and remaining lives carry over to the next level.
     this.scene.restart({ levelId: next, score: this.sim.score, lives: this.sim.lives });
   }
 
@@ -340,7 +340,11 @@ export class GameScene extends Phaser.Scene {
 
   private drawBackground(): void {
     const g = this.add.graphics();
-    g.fillGradientStyle(PALETTE.skyTop, PALETTE.skyTop, PALETTE.skyBottom, PALETTE.skyBottom, 1);
+    const th = this.sim.level.theme;
+    const hex = (v: string | undefined, d: number) => (v ? parseInt(v.slice(1), 16) : d);
+    const top = hex(th?.skyTop, PALETTE.skyTop);
+    const bottom = hex(th?.skyBottom, PALETTE.skyBottom);
+    g.fillGradientStyle(top, top, bottom, bottom, 1);
     g.fillRect(0, 0, GAME_W, GAME_H);
     // sun + clouds
     g.fillStyle(0xfff3a0, 0.9);
@@ -711,15 +715,17 @@ export class GameScene extends Phaser.Scene {
       title = 'GAME OVER';
       body = `最終分數 ${sim.score}\n\nEnter / R 重試　Q 回選單`;
     } else if (sim.status === 'LEVEL_CLEAR') {
-      title = '過關！';
-      const next = this.levelId === 'mechanics-test' ? 'Enter 回選單' : 'Enter 進入機制測試關';
-      body = `分數 ${sim.score}（含剩餘時間獎勵）\n\n${next}\nR 重玩本關　Q 回選單`;
+      const next = nextCampaignLevel(this.levelId);
+      const lastOfCampaign = !next && this.levelId !== 'mechanics-test';
+      title = lastOfCampaign ? '全部過關！' : '過關！';
+      const nextLine = next ? `Enter 進入下一關：${LEVELS[next]!.name}` : 'Enter 回選單';
+      body = `分數 ${sim.score}（含剩餘時間獎勵）\n\n${nextLine}\nR 重玩本關　Q 回選單`;
     } else if (this.paused) {
       title = '暫停';
       body = 'Esc / Enter 繼續\nH 操作說明　R 重來　Q 回選單\n\n切換分頁時會自動暫停';
     } else if (sim.status === 'READY') {
       title = this.sim.lives < this.sim.cfg.startLives ? `剩 ${sim.lives} 條命` : 'READY!';
-      body = '把敵人困在洞裡，再敲下去！';
+      body = sim.level.hint ?? '把敵人困在洞裡，再敲下去！';
     } else if (sim.status === 'LIFE_LOST') {
       title = '哎呀！';
       body = `剩 ${sim.lives} 條命`;
@@ -728,7 +734,7 @@ export class GameScene extends Phaser.Scene {
     this.overlay.setVisible(show);
     if (!show) return;
     this.overlayTitle.setText(title);
-    this.overlayBody.setText(body).setFontSize(small ? 18 : 20);
+    this.overlayBody.setText(body).setFontSize(small ? 18 : 20).setWordWrapWidth(small ? 720 : 560, true);
     const h = small ? 420 : sim.status === 'READY' || sim.status === 'LIFE_LOST' ? 200 : 330;
     this.overlayBg.setSize(small ? 760 : 620, h);
     this.overlayBg.setPosition(GAME_W / 2, GAME_H / 2);

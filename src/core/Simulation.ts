@@ -102,7 +102,8 @@ export class Simulation {
   };
 
   constructor(level: LevelData, opts: SimOptions = {}) {
-    this.cfg = { ...DEFAULT_CONFIG, ...opts.config };
+    // Precedence: defaults < level tuning < explicit options (tests).
+    this.cfg = { ...DEFAULT_CONFIG, ...level.tuning, ...opts.config };
     this.level = level;
     this.map = new MapGrid(level, this.cfg.digPulses);
     this.rng = new SeededRng(opts.seed ?? level.seed);

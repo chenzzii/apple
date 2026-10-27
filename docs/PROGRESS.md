@@ -7,8 +7,16 @@ Status: **Stage 1 playable prototype implemented and verified** (2026-10-26).
 npm install
 npm run dev        # open the printed http://localhost:5173 URL
 ```
-Menu: **Enter** start level 1 · **T** mechanics test level · **H** help · **C** switch keymap · **1–4** world speed (1.0 / 1.25 / 1.5 / 2.0x).
+Menu: **Enter** start game · **L** choose start level · **T** mechanics test level · **H** help · **C** switch keymap · **1–4** world speed (1.0 / 1.25 / 1.5 / 2.0x).
 In game: arrows/WASD move & climb, **J** LEFT tile / **K** RIGHT tile — dig solid floor, fill an open hole, pound a trapped enemy (classic keymap: I/J/K/M + A/S) · **Esc/P** pause · **H** help · **R** restart · **N** mute all · **B** music on/off · **G** re-open test holes (test level only).
+
+## 2026-10-27 (5) — Level 2 「捕蠅草溫室」 (owner request: next level)
+- New `src/levels/level02.json`: 2 green flytraps + 2 red apples, new ladder layout, 200 s, mint "greenhouse" sky, enemies slightly faster (84 vs 80 px/s, via new per-level `tuning`). Teaches the core skill: greens need a 2-floor fall, so dig the lower hole, then the aligned hole above.
+- Campaign: level 1 → level 2 → 「全部過關」; score and lives carry over. Clear screen names the next level. Menu **L** picks the start level. READY screen shows a per-level `hint`.
+- Level format additions (validated): `tuning` (per-level config overrides), `theme` (sky colours), `hint`.
+- Tests: **50** passing. New `tests/levels.test.ts` + scripted `tests/ambushBot.ts`: level 2 cleared by the bot with the normal 3 lives (both greens by 2-floor falls) and across 5 enemy-RNG seeds (≤ 5 lives); level 1 still cleared.
+- Browser (`tools/playtest/level02-win.cjs`, real keys driven by the same bot): **LEVEL_CLEAR on attempt 6** (score 2500, both greens fell 2). Earlier attempts lost because the headless container renders at ~8–15 fps and the bot reacts late; a human on a normal PC should find it easier, but **human difficulty is not yet verified**.
+- `npm run typecheck` ✅ · `npm run test` ✅ 50 · `npm run build` ✅ · 0 console errors.
 
 ## 2026-10-27 (4) — enemies redesigned as plants (owner request)
 - Red stays an apple (already a plant; now with root feet and two leaves). Green butterfly → **綠捕蠅草** (wide, two spiky jaws hinged at the back that snap open toward its walking direction). Blue mask → **藍仙人掌** (tall, arms, spines, flower on top). Rules, colours and scores unchanged; silhouettes stay squat / wide / tall so they are distinguishable without colour.
@@ -40,7 +48,7 @@ In game: arrows/WASD move & climb, **J** LEFT tile / **K** RIGHT tile — dig so
 ## Latest verified work
 - Pure TypeScript deterministic simulation in `src/core/` (fixed 60 Hz, seeded RNG, typed events), no Phaser imports.
 - Phaser 4.2.1 scenes in `src/game/` render with interpolation, own the keyboard, HUD, overlays, Web Audio SFX and particles.
-- Two validated JSON levels in `src/levels/`: `level01` (3 red, clearable) and `mechanics-test` (green + blue + red with aligned/offset preset shafts).
+- Validated JSON levels in `src/levels/`: `level01` (3 red), `level02` (2 green + 2 red) and `mechanics-test` (green + blue + red with aligned/offset preset shafts).
 - Original programmatic cartoon art (`src/rendering/VectorArt.ts`): gardener and three plant enemies (squat apple, wide flytrap, tall cactus); no external assets.
 
 ## Commands run (2026-10-26, Node 22.23, this container)
