@@ -38,6 +38,8 @@ Legend: **VERIFIED** = stated in the original Apple II manual / GDD §1 sources.
 - **D12 Frame timing.** The scene measures its own real frame delta with `performance.now()` (Phaser's delta is smoothed), clamps it to 100 ms, multiplies by world speed, and runs at most `ceil(5 × speed)` logic steps per frame; extra time is dropped, not replayed.
 - **D13 Mechanics test level** starts the player on the top floor with the green and blue enemies, and pre-opens aligned shafts (col 8: one hole below → green 2 floors; col 10: two holes below → blue 3 floors) plus an offset hole (col 9 on floor 2). Key **G** re-opens the preset holes (never under an enemy).
 
+- **D14 Music.** Original compositions only (no recreation of the 1981 game's audio). Music restarts from the top after pause or a lost life rather than resuming mid-phrase (simpler; PROVISIONAL). Music volume is fixed relative to SFX; a volume slider is not in Stage 1.
+
 ## Not done yet (by design for Stage 1)
 - No comparison against original gameplay footage: speeds, trap time, scoring bonus and level layouts are not frame-accurate.
 - Only one campaign level; no original 32-level data.

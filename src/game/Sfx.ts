@@ -4,6 +4,11 @@ import { settings } from './Settings';
 export class Sfx {
   private ctx: AudioContext | null = null;
 
+  /** Shared AudioContext (null until the first user gesture unlocks audio). */
+  get context(): AudioContext | null {
+    return this.ctx;
+  }
+
   unlock(): void {
     try {
       if (!this.ctx) this.ctx = new AudioContext();

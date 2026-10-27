@@ -20,7 +20,9 @@ Open the URL Vite prints. **Enter** starts level 1, **T** opens the mechanics te
 
 One key, three actions (6 pulses each): solid floor → **dig**, existing hole → **fill**, trapped enemy → **pound it down**. A held key pauses after each completed action; release and press again to continue.
 
-Esc/P pause · 1–4 world speed (1.0/1.25/1.5/2.0x) · R restart · N mute · C (menu) switch keymap.
+Esc/P pause · 1–4 world speed (1.0/1.25/1.5/2.0x) · R restart · N mute all · B music on/off · C (menu) switch keymap.
+
+Music: two original chiptune-style loops generated live with Web Audio (`src/game/music/score.ts`) — no audio files.
 
 Walking onto an open hole drops **you** to the floor below too. Enemies: red apple needs a 1-floor fall, green butterfly 2, blue mask 3 — in one continuous fall through holes in the **same column**.
 

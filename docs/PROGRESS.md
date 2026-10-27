@@ -8,7 +8,15 @@ npm install
 npm run dev        # open the printed http://localhost:5173 URL
 ```
 Menu: **Enter** start level 1 · **T** mechanics test level · **H** help · **C** switch keymap · **1–4** world speed (1.0 / 1.25 / 1.5 / 2.0x).
-In game: arrows/WASD move & climb, **J** LEFT tile / **K** RIGHT tile — dig solid floor, fill an open hole, pound a trapped enemy (classic keymap: I/J/K/M + A/S) · **Esc/P** pause · **H** help · **R** restart · **N** mute · **G** re-open test holes (test level only).
+In game: arrows/WASD move & climb, **J** LEFT tile / **K** RIGHT tile — dig solid floor, fill an open hole, pound a trapped enemy (classic keymap: I/J/K/M + A/S) · **Esc/P** pause · **H** help · **R** restart · **N** mute all · **B** music on/off · **G** re-open test holes (test level only).
+
+## 2026-10-27 (3) — original background music (owner request)
+- Two original loops written as data in `src/game/music/score.ts`, played by a look-ahead Web Audio sequencer (`src/game/music/Music.ts`); no audio files, no third-party music.
+  - Menu: "Morning Orchard" (100 BPM, triangle lead + arpeggio + bass).
+  - In game: "Orchard Run" (140 BPM, square lead, oom-pah bass, kick/snare/hat).
+- Music plays in READY/PLAYING; silent while paused, after a hit, on level clear / game over (SFX jingles take over). Tempo × (1 + (speed−1)/2), and ×1.2 when ≤ 20 s remain. **B** toggles music; **N** still mutes everything. Setting persists.
+- `npm run typecheck` ✅ · `npm run test` ✅ **42 tests** (new `tests/music.test.ts`: pitch math, every voice/drum bar fills the loop) · `npm run build` ✅
+- Browser (`tools/playtest/music-check.cjs`): silent before first key (autoplay policy), menu theme after a key, game theme in level, both with measured signal on the music bus (RMS ≈ 0.06–0.07), 0 while paused and after B, resumes after; tempo 1.5 at 2.0x; 0 console errors.
 
 ## 2026-10-27 (2) — same key digs, fills or pounds (owner request)
 - J/K: solid or partly dug tile → dig; open hole → fill (6 pulses, like pounding); trapped enemy → pound. Fill action is back.
